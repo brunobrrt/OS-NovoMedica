@@ -536,3 +536,73 @@ table tbody tr:hover {
         padding: 8px !important;
     }
 }
+/* Mobile Responsive Styles */
+@media screen and (max-width: 768px) {
+    .main-content {
+        padding: 10px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .stat-card h3 {
+        font-size: 12px;
+    }
+    
+    .stat-number {
+        font-size: 22px;
+    }
+    
+    .modal-content {
+        width: 95% !important;
+        max-width: 95% !important;
+        margin: 20px auto;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    #fotos-entrada-preview,
+    #fotos-saida-preview {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .data-table {
+        font-size: 12px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 6px !important;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .form-actions button {
+        width: 100%;
+    }
+    
+    .panel-controls {
+        flex-wrap: wrap;
+    }
+    
+    .btn-sm {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    #fotos-entrada-preview,
+    #fotos-saida-preview {
+        grid-template-columns: 1fr !important;
+    }
+}

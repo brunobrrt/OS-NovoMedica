@@ -2254,8 +2254,16 @@ class OSDashboard {
 
     // Funções para gerenciar fotos de entrada
     openFotosEntrada(atendimentoId) {
+        // Buscar em todos os arrays possíveis
         const atendimentos = JSON.parse(localStorage.getItem('mockAtendimentos') || '[]');
-        const atendimento = atendimentos.find(a => a.id === atendimentoId);
+        const ordensServico = JSON.parse(localStorage.getItem('mockOrdens') || '[]');
+        
+        let atendimento = atendimentos.find(a => a.id === atendimentoId);
+        
+        // Se não encontrou em atendimentos, buscar em OS
+        if (!atendimento) {
+            atendimento = ordensServico.find(o => o.id === atendimentoId);
+        }
         
         if (!atendimento) {
             this.showNotification('Atendimento não encontrado', 'error');
@@ -2324,10 +2332,35 @@ class OSDashboard {
 
     salvarFotosEntrada() {
         const atendimentoId = document.getElementById('fotos-entrada-item-id').value;
-        const atendimentos = JSON.parse(localStorage.getItem('mockAtendimentos') || '[]');
-        const index = atendimentos.findIndex(a => a.id === atendimentoId);
         
-        if (index === -1) {
+        // Buscar em todos os arrays possíveis
+        const atendimentos = JSON.parse(localStorage.getItem('mockAtendimentos') || '[]');
+        const ordensServico = JSON.parse(localStorage.getItem('mockOrdens') || '[]');
+        
+        let found = false;
+        let targetArray = null;
+        let targetKey = null;
+        let index = -1;
+        
+        // Tentar encontrar em atendimentos
+        index = atendimentos.findIndex(a => a.id === atendimentoId);
+        if (index !== -1) {
+            found = true;
+            targetArray = atendimentos;
+            targetKey = 'mockAtendimentos';
+        }
+        
+        // Se não encontrou, buscar em OS
+        if (!found) {
+            index = ordensServico.findIndex(o => o.id === atendimentoId);
+            if (index !== -1) {
+                found = true;
+                targetArray = ordensServico;
+                targetKey = 'mockOrdens';
+            }
+        }
+        
+        if (!found) {
             this.showNotification('Atendimento não encontrado', 'error');
             return;
         }
@@ -2336,12 +2369,12 @@ class OSDashboard {
         const previewDiv = document.getElementById('fotos-entrada-preview');
         const fotos = Array.from(previewDiv.querySelectorAll('img')).map(img => img.src);
 
-        atendimentos[index].fotosEntrada = fotos;
-        atendimentos[index].fotosEntradaObs = document.getElementById('fotos-entrada-obs').value;
-        atendimentos[index].fotosEntradaCount = fotos.length;
-        atendimentos[index].updatedAt = new Date().toISOString();
+        targetArray[index].fotosEntrada = fotos;
+        targetArray[index].fotosEntradaObs = document.getElementById('fotos-entrada-obs').value;
+        targetArray[index].fotosEntradaCount = fotos.length;
+        targetArray[index].updatedAt = new Date().toISOString();
 
-        localStorage.setItem('mockAtendimentos', JSON.stringify(atendimentos));
+        localStorage.setItem(targetKey, JSON.stringify(targetArray));
         
         this.showNotification('Fotos e observações de entrada salvas com sucesso', 'success');
         this.closeModal('fotos-entrada-modal');
@@ -2350,8 +2383,16 @@ class OSDashboard {
 
     // Funções para gerenciar fotos de saída
     openFotosSaida(atendimentoId) {
+        // Buscar em todos os arrays possíveis
         const atendimentos = JSON.parse(localStorage.getItem('mockAtendimentos') || '[]');
-        const atendimento = atendimentos.find(a => a.id === atendimentoId);
+        const ordensServico = JSON.parse(localStorage.getItem('mockOrdens') || '[]');
+        
+        let atendimento = atendimentos.find(a => a.id === atendimentoId);
+        
+        // Se não encontrou em atendimentos, buscar em OS
+        if (!atendimento) {
+            atendimento = ordensServico.find(o => o.id === atendimentoId);
+        }
         
         if (!atendimento) {
             this.showNotification('Atendimento não encontrado', 'error');
@@ -2382,10 +2423,35 @@ class OSDashboard {
 
     salvarFotosSaida() {
         const atendimentoId = document.getElementById('fotos-saida-item-id').value;
-        const atendimentos = JSON.parse(localStorage.getItem('mockAtendimentos') || '[]');
-        const index = atendimentos.findIndex(a => a.id === atendimentoId);
         
-        if (index === -1) {
+        // Buscar em todos os arrays possíveis
+        const atendimentos = JSON.parse(localStorage.getItem('mockAtendimentos') || '[]');
+        const ordensServico = JSON.parse(localStorage.getItem('mockOrdens') || '[]');
+        
+        let found = false;
+        let targetArray = null;
+        let targetKey = null;
+        let index = -1;
+        
+        // Tentar encontrar em atendimentos
+        index = atendimentos.findIndex(a => a.id === atendimentoId);
+        if (index !== -1) {
+            found = true;
+            targetArray = atendimentos;
+            targetKey = 'mockAtendimentos';
+        }
+        
+        // Se não encontrou, buscar em OS
+        if (!found) {
+            index = ordensServico.findIndex(o => o.id === atendimentoId);
+            if (index !== -1) {
+                found = true;
+                targetArray = ordensServico;
+                targetKey = 'mockOrdens';
+            }
+        }
+        
+        if (!found) {
             this.showNotification('Atendimento não encontrado', 'error');
             return;
         }
@@ -2394,12 +2460,12 @@ class OSDashboard {
         const previewDiv = document.getElementById('fotos-saida-preview');
         const fotos = Array.from(previewDiv.querySelectorAll('img')).map(img => img.src);
 
-        atendimentos[index].fotosSaida = fotos;
-        atendimentos[index].fotosSaidaObs = document.getElementById('fotos-saida-obs').value;
-        atendimentos[index].fotosSaidaCount = fotos.length;
-        atendimentos[index].updatedAt = new Date().toISOString();
+        targetArray[index].fotosSaida = fotos;
+        targetArray[index].fotosSaidaObs = document.getElementById('fotos-saida-obs').value;
+        targetArray[index].fotosSaidaCount = fotos.length;
+        targetArray[index].updatedAt = new Date().toISOString();
 
-        localStorage.setItem('mockAtendimentos', JSON.stringify(atendimentos));
+        localStorage.setItem(targetKey, JSON.stringify(targetArray));
         
         this.showNotification('Fotos e observações de saída salvas com sucesso', 'success');
         this.closeModal('fotos-saida-modal');
