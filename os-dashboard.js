@@ -2296,6 +2296,10 @@ class OSDashboard {
         const files = event.target.files;
         const previewDiv = document.getElementById(`fotos-${tipo}-preview`);
         
+        if (!files || files.length === 0) {
+            return;
+        }
+        
         Array.from(files).forEach(file => {
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
@@ -2303,7 +2307,7 @@ class OSDashboard {
                     const img = document.createElement('div');
                     img.style.cssText = 'position: relative; border: 2px solid #ddd; border-radius: 8px; overflow: hidden;';
                     img.innerHTML = `
-                        <img src="${e.target.result}" style="width: 100%; height: 120px; object-fit: cover;">
+                        <img src="${e.target.result}" style="width: 100%; height: 120px; object-fit: cover;" data-image-data="${e.target.result}">
                         <button onclick="this.parentElement.remove()" style="position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-size: 16px; line-height: 1;">×</button>
                     `;
                     previewDiv.appendChild(img);
@@ -2322,7 +2326,7 @@ class OSDashboard {
                 const img = document.createElement('div');
                 img.style.cssText = 'position: relative; border: 2px solid #ddd; border-radius: 8px; overflow: hidden;';
                 img.innerHTML = `
-                    <img src="${fotoData}" style="width: 100%; height: 120px; object-fit: cover;">
+                    <img src="${fotoData}" data-image-data="${fotoData}" style="width: 100%; height: 120px; object-fit: cover;">
                     <button onclick="this.parentElement.remove()" style="position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-size: 16px; line-height: 1;">×</button>
                 `;
                 previewDiv.appendChild(img);
@@ -2367,7 +2371,17 @@ class OSDashboard {
 
         // Coletar todas as imagens do preview
         const previewDiv = document.getElementById('fotos-entrada-preview');
-        const fotos = Array.from(previewDiv.querySelectorAll('img')).map(img => img.src);
+        const imgElements = previewDiv.querySelectorAll('img');
+        
+        if (imgElements.length === 0) {
+            this.showNotification('Nenhuma foto foi adicionada', 'warning');
+            return;
+        }
+        
+        const fotos = Array.from(imgElements).map(img => {
+            // Tentar pegar do data-attribute primeiro, senão usar src
+            return img.dataset.imageData || img.src;
+        });
 
         targetArray[index].fotosEntrada = fotos;
         targetArray[index].fotosEntradaObs = document.getElementById('fotos-entrada-obs').value;
@@ -2376,7 +2390,7 @@ class OSDashboard {
 
         localStorage.setItem(targetKey, JSON.stringify(targetArray));
         
-        this.showNotification('Fotos e observações de entrada salvas com sucesso', 'success');
+        this.showNotification(`${fotos.length} foto(s) e observações de entrada salvas com sucesso`, 'success');
         this.closeModal('fotos-entrada-modal');
         this.loadEntradaAparelhos();
     }
@@ -2458,7 +2472,17 @@ class OSDashboard {
 
         // Coletar todas as imagens do preview
         const previewDiv = document.getElementById('fotos-saida-preview');
-        const fotos = Array.from(previewDiv.querySelectorAll('img')).map(img => img.src);
+        const imgElements = previewDiv.querySelectorAll('img');
+        
+        if (imgElements.length === 0) {
+            this.showNotification('Nenhuma foto foi adicionada', 'warning');
+            return;
+        }
+        
+        const fotos = Array.from(imgElements).map(img => {
+            // Tentar pegar do data-attribute primeiro, senão usar src
+            return img.dataset.imageData || img.src;
+        });
 
         targetArray[index].fotosSaida = fotos;
         targetArray[index].fotosSaidaObs = document.getElementById('fotos-saida-obs').value;
@@ -2467,7 +2491,7 @@ class OSDashboard {
 
         localStorage.setItem(targetKey, JSON.stringify(targetArray));
         
-        this.showNotification('Fotos e observações de saída salvas com sucesso', 'success');
+        this.showNotification(`${fotos.length} foto(s) e observações de saída salvas com sucesso`, 'success');
         this.closeModal('fotos-saida-modal');
         this.loadSaidaAparelhos();
     }
