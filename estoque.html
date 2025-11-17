@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Estoque</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="estoque.css">
+</head>
+<body>
+    <div id="sidebar" class="sidebar">
+        <h2>Menu</h2>
+        <nav>
+            <a href="dashboard.html">Painel de Controle</a>
+            <a href="registrar.html">Registrar Venda</a>
+            <a href="entrada.html">Entrada Avulsa de Reparo</a>
+            <a href="atendimentos.html">Atendimentos Ativos</a>
+            <a href="historico.html">Histórico Geral (O.S.)</a>
+            <a href="garantia.html">Itens na Garantia</a>
+            <a href="visitas.html">Aguardando Visita Técnica</a>
+            <a href="remoto.html">Atendimento Remoto</a>
+            <a href="cursos.html">Cursos</a>
+            <a href="acaminho.html">Aparelhos a Caminho</a>
+            <a href="clientes.html">Lista de Clientes</a>
+            <a href="estoque.html" class="active">Estoque</a>
+            <a href="financeiro.html">Financeiro</a>
+        </nav>
+        <div class="user-info">
+            <span id="userEmail"></span>
+            <button id="logoutButton">Sair</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <button id="menu-toggle">☰</button>
+            <h1>Gestão de Estoque</h1>
+        </header>
+        
+        <div class="container-estoque">
+            <div class="form-section-estoque">
+                <h3>Adicionar Item ao Estoque</h3>
+                <form id="stockForm">
+                    <div class="form-group">
+                        <label>Empresa do Estoque:</label>
+                        <div class="radio-group">
+                            <input type="radio" id="empresaAbla" name="empresa" value="Abla" required><label for="empresaAbla">Abla</label>
+                            <input type="radio" id="empresaAstros" name="empresa" value="Astros"><label for="empresaAstros">Astros</label>
+                            <input type="radio" id="empresaNovomedica" name="empresa" value="Novomédica"><label for="empresaNovomedica">Novomédica</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Condição do Item:</label>
+                        <div class="radio-group">
+                            <input type="radio" id="condicaoNovo" name="condicao" value="Novo" required><label for="condicaoNovo">Novo</label>
+                            <input type="radio" id="condicaoRevisado" name="condicao" value="Revisado"><label for="condicaoRevisado">Revisado</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Aparelho ou Acessório Principal:</label>
+                        <div id="aparelhos-list" class="checklist-group"></div>
+                    </div>
+                    
+                    <div class="form-group-inline">
+                         <div class="form-group">
+                            <label for="quantity">Quantidade:</label>
+                            <input type="number" id="quantity" value="1" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="arrivalDate">Data de Chegada:</label>
+                            <input type="date" id="arrivalDate" required>
+                        </div>
+                    </div>
+
+                    <div id="serial-numbers-container" class="form-group">
+                        </div>
+
+                    <div class="form-group">
+                        <label for="notes">Observações:</label>
+                        <textarea id="notes" rows="3" placeholder="Detalhes sobre o lote, condição, etc."></textarea>
+                    </div>
+                    
+                    <button id="saveStockButton" type="button">Adicionar ao Estoque</button>
+                </form>
+            </div>
+
+            <div class="list-section-estoque">
+                <h3>Itens em Estoque (Agrupados)</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Empresa</th>
+                                <th>Condição</th>
+                                <th>Qtd. Total</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stockTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="qr-modal-overlay" class="modal-overlay"> ... </div>
+
+    <div id="action-modal" class="modal-overlay">
+        <div class="modal-content large">
+            <h2 id="action-modal-title">Gerenciar Itens</h2>
+            <div class="modal-body">
+                <table class="modal-table">
+                    <thead>
+                        <tr>
+                            <th>Nº de Série</th>
+                            <th>Data de Chegada</th>
+                            <th>Observações</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-item-list">
+                        </tbody>
+                </table>
+            </div>
+            <div class="modal-buttons">
+                <button id="close-action-modal-button">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="overlay" class="overlay"></div>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script src="estoque.js"></script>
+</body>
+</html>

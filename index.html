@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Assistência - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Controle de Assistência</h2>
+        <p>Acesso da Equipe</p>
+        <div class="form-group">
+            <input type="email" id="email" placeholder="Seu e-mail" required>
+        </div>
+        <div class="form-group">
+            <input type="password" id="password" placeholder="Sua senha" required>
+        </div>
+        <button id="loginButton">Entrar</button>
+        <p id="errorMessage" class="error-message"></p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    
+    <script src="auth.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

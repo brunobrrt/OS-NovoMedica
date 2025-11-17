@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atendimento Remoto - Controle de Assistência</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="remoto.css">
+</head>
+<body>
+    <div id="sidebar" class="sidebar">
+        <h2>Menu</h2>
+        <nav>
+            <a href="dashboard.html">Painel de Controle</a>
+            <a href="registrar.html">Registrar Venda</a>
+            <a href="entrada.html">Entrada Avulsa de Reparo</a>
+            <a href="atendimentos.html">Atendimentos Ativos</a>
+            <a href="visitas.html">Aguardando Visita Técnica</a>
+            <a href="remoto.html" class="active">Atendimento Remoto</a>
+            <a href="cursos.html">Cursos e Eventos</a>
+            <a href="garantia.html">Itens na Garantia</a>
+            <a href="acaminho.html">Aparelhos a Caminho</a>
+            <a href="historico.html">Histórico Geral (O.S.)</a>
+            <a href="clientes.html">Lista de Clientes</a>
+            <a href="estoque.html">Estoque</a>
+            <a href="financeiro.html">Financeiro</a>
+        </nav>
+        <div class="user-info">
+            <span id="userEmail"></span>
+            <button id="logoutButton">Sair</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <button id="menu-toggle">☰</button>
+            <h1>Agendamento de Atendimento Remoto</h1>
+        </header>
+        
+        <div class="container-visitas">
+            <div class="form-section-visita">
+                <h3>Agendar Novo Atendimento</h3>
+                <input type="text" id="remoteCustomerName" placeholder="Nome do Cliente">
+                <input type="text" id="remoteContact" placeholder="Contato do Cliente">
+                <textarea id="remoteProblem" placeholder="Problema relatado..."></textarea>
+                <label for="remoteDate">Data Agendada:</label>
+                <input type="date" id="remoteDate">
+                <label for="technicianName">Técnico Responsável:</label>
+                <input type="text" id="technicianName" placeholder="Nome do técnico">
+                <button id="saveRemoteButton">Agendar Atendimento</button>
+            </div>
+
+            <div class="calendar-section-visita">
+                <div class="calendar-header">
+                    <button id="prev-month-button">&lt;</button>
+                    <h2 id="calendar-month-year"></h2>
+                    <button id="next-month-button">&gt;</button>
+                </div>
+                <div class="calendar-grid">
+                    <div class="day-name">Dom</div><div class="day-name">Seg</div><div class="day-name">Ter</div><div class="day-name">Qua</div><div class="day-name">Qui</div><div class="day-name">Sex</div><div class="day-name">Sáb</div>
+                </div>
+                <div id="calendar-days" class="calendar-grid"></div>
+                <div id="visit-details" class="visit-details-box">
+                    <p>Clique em um dia para ver os detalhes do atendimento.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="overlay" class="overlay"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+    <script src="remoto.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+.container-visitas { display: flex; gap: 30px; padding: 30px; align-items: flex-start; flex-wrap: wrap; }
+.form-section-visita { flex: 1; min-width: 350px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.form-section-visita h3, .form-section-visita label { margin-top: 0; display: block; margin-bottom: 5px; font-weight: bold; }
+.form-section-visita input, .form-section-visita textarea, .form-section-visita button { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+.form-section-visita button { background-color: #007bff; color: white; cursor: pointer; }
+.calendar-section-visita { flex: 2; min-width: 500px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.calendar-header h2 { margin: 0; font-size: 1.5em; }
+.calendar-header button { background: #007bff; color: white; border: none; font-size: 1.5em; cursor: pointer; border-radius: 50%; width: 40px; height: 40px; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; gap: 5px; }
+.day-name { font-weight: bold; padding: 10px 0; }
+.day-cell { padding: 10px 5px; border-radius: 4px; transition: background-color 0.2s; min-height: 40px; }
+.day-cell.other-month { color: #ccc; }
+.day-cell.has-visit { background-color: #6f42c1; color: white; cursor: pointer; font-weight: bold; } /* Cor roxa para cursos */
+.day-cell.today { border: 2px solid #007bff; }
+.visit-details-box { margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; min-height: 100px; }
+.visit-details-box h4 { margin-top: 0; }
+.visit-details-box p { margin: 5px 0; text-align: left; white-space: pre-wrap; }
+/* --- ESTILOS PARA OS BOTÕES DE AÇÃO DOS CURSOS --- */
+.visit-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap; /* Garante que os botões se ajustem em telas menores */
+}
+.visit-actions button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+.btn-preparado { background-color: #28a745; } /* Verde */
+.btn-adiado { background-color: #ffc107; color: #333; } /* Amarelo */
+.btn-deletar { background-color: #dc3545; } /* Vermelho */

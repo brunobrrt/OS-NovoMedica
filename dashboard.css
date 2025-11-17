@@ -1,0 +1,69 @@
+:root {
+    --sidebar-width: 250px;
+    --blue: #007bff;
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f4f6f9;
+    margin: 0;
+    color: #495057;
+}
+.sidebar {
+    position: fixed; left: 0; top: 0; width: var(--sidebar-width); height: 100%;
+    background-color: #007bff; color: white; display: flex; flex-direction: column;
+    z-index: 1001;
+    transition: transform 0.3s ease-in-out;
+}
+.main-content { 
+    margin-left: var(--sidebar-width); 
+    transition: margin-left 0.3s ease-in-out;
+}
+.main-content header {
+    height: 60px; background-color: #ffffff; padding: 0 20px;
+    display: flex; align-items: center; border-bottom: 1px solid #dee2e6;
+}
+#menu-toggle {
+    display: none;
+    background: none; border: none; font-size: 24px; cursor: pointer;
+    margin-right: 15px;
+}
+.sidebar h2 { font-weight: 300; text-align: center; padding: 20px 0; margin: 0; background-color: rgba(0,0,0,0.1); }
+.sidebar nav a { display: block; color: rgba(255, 255, 255, 0.8); text-decoration: none; padding: 15px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+.sidebar nav a:hover { background-color: rgba(0,0,0,0.2); color: white; }
+.sidebar nav a.active { background-color: white; color: var(--blue); font-weight: bold; }
+.sidebar nav a.disabled { color: rgba(255, 255, 255, 0.4); cursor: not-allowed; }
+.sidebar .user-info { margin-top: auto; padding: 20px; text-align: center; }
+.sidebar .user-info button { width: 100%; margin-top: 10px; padding: 10px; cursor: pointer; background-color: rgba(255,255,255,0.2); border: 1px solid white; color: white; border-radius: 4px; }
+.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 30px; }
+.card { background-color: white; padding: 20px; border-radius: 5px; box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2); color: white; }
+.card h3 { margin-top: 0; font-size: 16px; font-weight: bold; }
+.card-number { font-size: 38px; font-weight: bold; margin: 10px 0; }
+.card.color-blue { background-color: #17a2b8; }
+.card.color-orange { background-color: #ffd61b; }
+.card.color-purple { background-color: #605ca8; }
+.card.color-teal { background-color: #39cccc; }
+.card.color-green { background-color: #1bff82; }
+.card.color-dark-gray { background-color: #6c757d; }
+.card.color-yellow { background-color: #f39c12; }
+.card.color-pink { background-color: #d81b60; }
+.card.color-red { background-color: #c21807; }
+.card-link {
+    text-decoration: none;
+}
+.overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5); z-index: 1000;
+    opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+.overlay.active { opacity: 1; visibility: visible; }
+@media (max-width: 992px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); box-shadow: 3px 0 15px rgba(0,0,0,0.2); }
+    .main-content { margin-left: 0; }
+    #menu-toggle { display: block; }
+}
+/* --- CORREÇÃO PARA O BOTÃO SAIR --- */
+.sidebar nav {
+    flex-grow: 1; /* Faz a lista de links crescer e ocupar o espaço vago */
+    overflow-y: auto; /* Adiciona uma barra de rolagem SÓ na lista de links, se for necessário */
+}

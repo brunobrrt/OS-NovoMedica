@@ -1,0 +1,14 @@
+body { font-family: Arial, sans-serif; background-color: #f0f2f5; margin: 0; color: #333; }
+.header-simple { background-color: white; padding: 15px 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-bottom: 3px solid #007bff; }
+.header-simple h1 { margin: 0; font-size: 24px; }
+.header-simple a.home-link { color: #007bff; text-decoration: none; font-weight: bold; }
+.container { display: flex; padding: 30px; gap: 30px; flex-wrap: wrap; justify-content: center; max-width: 1200px; margin: 20px auto; }
+.form-section { flex: 2; background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); min-width: 300px; max-width: 600px; }
+.qr-section { flex: 1; background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; min-width: 300px; max-width: 400px; }
+.form-section input, .form-section textarea, .form-section button { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dddfe2; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+.form-section label { display: block; margin-bottom: 5px; font-weight: bold; }
+.form-section button { background-color: #36a420; color: white; border: none; font-size: 18px; font-weight: bold; cursor: pointer; }
+#qrcode-container { padding: 10px; border: 1px solid #eee; margin-bottom: 15px; display: inline-block; }
+#qrcode { width: 256px; height: 256px; margin: auto; }
+.button-download { display: inline-block; padding: 10px 20px; background-color: #0d6efd; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; }
+@media (max-width: 992px) { .container { flex-direction: column; align-items: center; } }

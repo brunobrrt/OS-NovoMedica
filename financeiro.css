@@ -1,0 +1,57 @@
+.container-financeiro {
+    padding: 30px;
+}
+
+.list-section-financeiro h3 {
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.table-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table thead {
+    background-color: #f8f9fa;
+}
+
+table th, table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: middle;
+}
+
+/* Estilos para o status de pagamento */
+.status {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 12px;
+    color: white;
+    text-align: center;
+}
+
+.status-pago {
+    background-color: #28a745; /* Verde */
+}
+
+.status-pendente {
+    background-color: #ffc107; /* Amarelo */
+    color: #333;
+}
+
+.status-vencido {
+    background-color: #dc3545; /* Vermelho */
+}

@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de OS - Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="os-dashboard.css">
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+</head>
+<body>
+    <div id="sidebar" class="sidebar">
+        <h2>Menu</h2>
+        <nav>
+            <a href="os-dashboard.html" class="active">Dashboard OS</a>
+            <a href="dashboard.html">Painel Principal</a>
+            <a href="registrar.html">Registrar Venda</a>
+            <a href="entrada.html">Entrada de Reparo</a>
+            <a href="atendimentos.html">Atendimentos</a>
+            <a href="clientes.html">Clientes</a>
+            <a href="estoque.html">Estoque</a>
+            <a href="financeiro.html">Financeiro</a>
+        </nav>
+        <div class="user-info">
+            <span id="userEmail"></span>
+            <button id="logoutButton">Sair</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <button id="menu-toggle">☰</button>
+            <h1>Sistema de Ordem de Serviço</h1>
+            <div class="header-actions">
+                <button id="qr-scan-btn" class="btn btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 5a2 2 0 012-2h5v2H5v5H3V5zM3 19v-5h2v5h5v2H5a2 2 0 01-2-2zM21 19a2 2 0 01-2 2h-5v-2h5v-5h2v5zM21 5v5h-2V5h-5V3h5a2 2 0 012 2z"/>
+                        <rect x="9" y="9" width="1.5" height="1.5"/>
+                        <rect x="13.5" y="9" width="1.5" height="1.5"/>
+                        <rect x="9" y="13.5" width="1.5" height="1.5"/>
+                        <rect x="13.5" y="13.5" width="1.5" height="1.5"/>
+                    </svg>
+                    Processar QR
+                </button>
+                <button id="manage-devices-btn" class="btn btn-secondary">📱 Aparelhos</button>
+                <button id="manage-clients-btn" class="btn btn-secondary">👥 Clientes</button>
+                <button id="new-atendimento-btn" class="btn btn-success">+ Novo Atendimento</button>
+                <button id="new-os-btn" class="btn btn-info">+ Nova OS</button>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <!-- Status de Atendimentos -->
+            <div class="stat-card" data-status="em_manutencao">
+                <h3>Em Manutenção</h3>
+                <div class="stat-number" id="stat-em-manutencao">0</div>
+                <small>Atendimentos em execução</small>
+            </div>
+            <div class="stat-card" data-status="aguardando_pecas">
+                <h3>Aguardando Peças</h3>
+                <div class="stat-number" id="stat-aguardando-pecas">0</div>
+                <small>Peças em trânsito/pedido</small>
+            </div>
+            <div class="stat-card" data-status="aparelho_pronto">
+                <h3>Aparelhos Prontos</h3>
+                <div class="stat-number" id="stat-aparelho-pronto">0</div>
+                <small>Aguardando retirada</small>
+            </div>
+            <div class="stat-card" data-status="aguardando_orcamento">
+                <h3>Aguardando Orçamento</h3>
+                <div class="stat-number" id="stat-aguardando-orcamento">0</div>
+                <small>Análise pendente</small>
+            </div>
+            <div class="stat-card" data-status="pendente">
+                <h3>Pendentes</h3>
+                <div class="stat-number" id="stat-pendente">0</div>
+                <small>Aguardando início</small>
+            </div>
+            <div class="stat-card" data-status="reprovado_esperando_devolucao">
+                <h3>Reprovados</h3>
+                <div class="stat-number" id="stat-reprovado">0</div>
+                <small>Esperando devolução</small>
+            </div>
+            <div class="stat-card" data-status="aguardando_visita_tecnica">
+                <h3>Visitas Técnicas</h3>
+                <div class="stat-number" id="stat-aguardando-visita">0</div>
+                <small>Aguardando visita</small>
+            </div>
+            <div class="stat-card" data-status="aparelho_a_caminho">
+                <h3>A Caminho</h3>
+                <div class="stat-number" id="stat-a-caminho">0</div>
+                <small>Em trânsito</small>
+            </div>
+            
+            <!-- Status de OS -->
+            <div class="stat-card" data-status="aguardando_assinatura">
+                <h3>Aguardando Assinatura</h3>
+                <div class="stat-number" id="stat-os-aguardando-assinatura">0</div>
+                <small>Pendente de assinatura</small>
+            </div>
+            <div class="stat-card" data-status="pending">
+                <h3>OS Pendentes</h3>
+                <div class="stat-number" id="stat-os-pending">0</div>
+                <small>Aguardando execução</small>
+            </div>
+            <div class="stat-card" data-status="signed">
+                <h3>OS Assinadas</h3>
+                <div class="stat-number" id="stat-os-signed">0</div>
+                <small>Com assinatura do cliente</small>
+            </div>
+            <div class="stat-card" data-status="awaiting_payment">
+                <h3>Aguardando Pagamento</h3>
+                <div class="stat-number" id="stat-os-awaiting-payment">0</div>
+                <small>Comercial - Cobranças</small>
+            </div>
+            <div class="stat-card" data-status="paid">
+                <h3>Pagas</h3>
+                <div class="stat-number" id="stat-os-paid">0</div>
+                <small>Pagamento confirmado</small>
+            </div>
+            <div class="stat-card" data-status="finalized">
+                <h3>OS Finalizadas</h3>
+                <div class="stat-number" id="stat-os-finalized">0</div>
+                <small>Trabalhos concluídos</small>
+            </div>
+        </div>
+
+        <div class="dashboard-panels">
+            <!-- Painel de Atendimentos -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Lista de Atendimentos</h2>
+                    <div class="panel-controls">
+                        <select id="filter-atendimentos">
+                            <option value="">Todos os Status</option>
+                            <option value="pendente">Pendente</option>
+                            <option value="aguardando_orcamento">Aguardando Orçamento</option>
+                            <option value="aguardando_pecas">Aguardando Peças</option>
+                            <option value="em_manutencao">Em Manutenção</option>
+                            <option value="periodo_testes">Período de Testes</option>
+                            <option value="aparelho_pronto">Aparelho Pronto</option>
+                            <option value="reprovado_esperando_devolucao">Reprovado - Esperando Devolução</option>
+                            <option value="aguardando_visita_tecnica">Aguardando Visita Técnica</option>
+                            <option value="aparelho_a_caminho">Aparelho a Caminho</option>
+                            <option value="os_criada">OS Criada</option>
+                            <option value="atendimento_finalizado">Atendimento Finalizado</option>
+                            <option value="recusado">Recusado</option>
+                        </select>
+                        <select id="filter-priority">
+                            <option value="">Todas as Prioridades</option>
+                            <option value="low">Baixa</option>
+                            <option value="medium">Média</option>
+                            <option value="high">Alta</option>
+                            <option value="urgent">Urgente</option>
+                        </select>
+                        <select id="sort-atendimentos">
+                            <option value="createdAt-desc">Data (Mais recente)</option>
+                            <option value="createdAt-asc">Data (Mais antigo)</option>
+                            <option value="priority-desc">Prioridade (Alta primeiro)</option>
+                            <option value="priority-asc">Prioridade (Baixa primeiro)</option>
+                        </select>
+                        <button id="refresh-atendimentos" class="btn btn-secondary">Atualizar</button>
+                        <button id="expand-atendimentos" class="btn btn-info">📋 Ver Lista Completa</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="atendimentos-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Telefone</th>
+                                <th>Serviço</th>
+                                <th>Prioridade</th>
+                                <th>Data Criação</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="atendimentos-tbody">
+                        </tbody>
+                    </table>
+                    <div id="atendimentos-loading" class="loading">Carregando...</div>
+                    <div id="atendimentos-empty" class="empty-state" style="display: none;">
+                        Nenhum atendimento encontrado
+                    </div>
+                </div>
+            </div>
+
+            <!-- Painel de Entrada de Aparelhos -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2> Entrada de Aparelhos</h2>
+                    <div class="panel-controls">
+                        <button id="refresh-entrada-aparelhos" class="btn btn-secondary">Atualizar</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="entrada-aparelhos-table">
+                        <thead>
+                            <tr>
+                                <th>Data Entrada</th>
+                                <th>Cliente</th>
+                                <th>Aparelho</th>
+                                <th>Serial</th>
+                                <th>Defeito Reclamado</th>
+                                <th>Fotos de Entrada</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="entrada-aparelhos-tbody">
+                        </tbody>
+                    </table>
+                    <div id="entrada-aparelhos-loading" class="loading">Carregando...</div>
+                    <div id="entrada-aparelhos-empty" class="empty-state" style="display: none;">
+                        Nenhum aparelho na entrada
+                    </div>
+                </div>
+            </div>
+
+            <!-- Painel de OS Pendentes -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>OS Pendentes</h2>
+                    <div class="panel-controls">
+                        <select id="filter-os-pending">
+                            <option value="">Todos os Status</option>
+                            <option value="pendente">Pendente</option>
+                            <option value="aguardando_assinatura">Aguardando Assinatura</option>
+                            <option value="signed">Assinada</option>
+                            <option value="aguardando_orcamento">Aguardando Orçamento</option>
+                            <option value="aguardando_pecas">Aguardando Peças</option>
+                            <option value="em_manutencao">Em Manutenção</option>
+                            <option value="periodo_testes">Período de Testes</option>
+                            <option value="aparelho_pronto">Aparelho Pronto</option>
+                            <option value="reprovado_esperando_devolucao">Reprovado - Esperando Devolução</option>
+                            <option value="aguardando_visita_tecnica">Aguardando Visita Técnica</option>
+                            <option value="aparelho_a_caminho">Aparelho a Caminho</option>
+                        </select>
+                        <button id="refresh-os-pending" class="btn btn-secondary">Atualizar</button>
+                        <button id="expand-os-pending" class="btn btn-info">📋 Ver Lista Completa</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="os-pending-table">
+                        <thead>
+                            <tr>
+                                <th>OS ID</th>
+                                <th>Cliente</th>
+                                <th>Sumário</th>
+                                <th>Técnico</th>
+                                <th>Data Abertura</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="os-pending-tbody">
+                        </tbody>
+                    </table>
+                    <div id="os-pending-loading" class="loading">Carregando...</div>
+                    <div id="os-pending-empty" class="empty-state" style="display: none;">
+                        Nenhuma OS pendente
+                    </div>
+                </div>
+            </div>
+
+            <!-- Painel de Aparelhos Prontos para Saída -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2> Aparelhos Prontos para Saída</h2>
+                    <div class="panel-controls">
+                        <button id="refresh-saida-aparelhos" class="btn btn-secondary">Atualizar</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="saida-aparelhos-table">
+                        <thead>
+                            <tr>
+                                <th>Data Conclusão</th>
+                                <th>Cliente</th>
+                                <th>Aparelho</th>
+                                <th>Serial</th>
+                                <th>Serviço Realizado</th>
+                                <th>Fotos de Saída</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="saida-aparelhos-tbody">
+                        </tbody>
+                    </table>
+                    <div id="saida-aparelhos-loading" class="loading">Carregando...</div>
+                    <div id="saida-aparelhos-empty" class="empty-state" style="display: none;">
+                        Nenhum aparelho pronto para saída
+                    </div>
+                </div>
+            </div>
+
+            <!-- Painel de OS Assinadas -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>OS Assinadas</h2>
+                    <div class="panel-controls">
+                        <button id="refresh-os-signed" class="btn btn-secondary">Atualizar</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="os-signed-table">
+                        <thead>
+                            <tr>
+                                <th>OS ID</th>
+                                <th>Código QR</th>
+                                <th>Cliente</th>
+                                <th>Sumário</th>
+                                <th>Técnico</th>
+                                <th>Data Assinatura</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="os-signed-tbody">
+                        </tbody>
+                    </table>
+                    <div id="os-signed-loading" class="loading">Carregando...</div>
+                    <div id="os-signed-empty" class="empty-state" style="display: none;">
+                        Nenhuma OS assinada
+                    </div>
+                </div>
+            </div>
+
+            <!-- Painel de OS Aguardando Pagamento -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>OS Aguardando Pagamento - Comercial</h2>
+                    <div class="panel-controls">
+                        <button id="refresh-os-awaiting-payment" class="btn btn-secondary">Atualizar</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="os-awaiting-payment-table">
+                        <thead>
+                            <tr>
+                                <th>OS ID</th>
+                                <th>Código QR</th>
+                                <th>Cliente</th>
+                                <th>Sumário</th>
+                                <th>Valor</th>
+                                <th>Método Pagamento</th>
+                                <th>Data Envio</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="os-awaiting-payment-tbody">
+                        </tbody>
+                    </table>
+                    <div id="os-awaiting-payment-loading" class="loading">Carregando...</div>
+                    <div id="os-awaiting-payment-empty" class="empty-state" style="display: none;">
+                        Nenhuma OS aguardando pagamento
+                    </div>
+                </div>
+            </div>
+
+            <!-- Painel de OS Pagas -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>OS Pagas</h2>
+                    <div class="panel-controls">
+                        <button id="refresh-os-paid" class="btn btn-secondary">Atualizar</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="os-paid-table">
+                        <thead>
+                            <tr>
+                                <th>OS ID</th>
+                                <th>Código QR</th>
+                                <th>Cliente</th>
+                                <th>Sumário</th>
+                                <th>Valor</th>
+                                <th>Data Pagamento</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="os-paid-tbody">
+                        </tbody>
+                    </table>
+                    <div id="os-paid-loading" class="loading">Carregando...</div>
+                    <div id="os-paid-empty" class="empty-state" style="display: none;">
+                        Nenhuma OS paga
+                    </div>
+                </div>
+            </div>
+
+            <!-- Painel de OS Finalizadas -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>OS Finalizadas</h2>
+                    <div class="panel-controls">
+                        <button id="refresh-os-finalized" class="btn btn-secondary">Atualizar</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="os-finalized-table">
+                        <thead>
+                            <tr>
+                                <th>OS ID</th>
+                                <th>Código QR</th>
+                                <th>Cliente</th>
+                                <th>Sumário</th>
+                                <th>Técnico</th>
+                                <th>Data Finalização</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="os-finalized-tbody">
+                        </tbody>
+                    </table>
+                    <div id="os-finalized-loading" class="loading">Carregando...</div>
+                    <div id="os-finalized-empty" class="empty-state" style="display: none;">
+                        Nenhuma OS finalizada
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal QR Code -->
+    <div id="qr-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Processar QR Code</h2>
+                <span class="close" data-modal="qr-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="qr-input-section">
+                    <label for="qr-input">Cole o código QR aqui:</label>
+                    <textarea id="qr-input" placeholder="Cole o token do QR Code..."></textarea>
+                    <button id="process-qr-btn" class="btn btn-primary">Processar QR Code</button>
+                </div>
+                <div id="qr-result" class="qr-result" style="display: none;">
+                    <div id="qr-success" class="qr-success" style="display: none;">
+                        <h3>QR Code válido!</h3>
+                        <div id="qr-client-info"></div>
+                        <div class="qr-actions">
+                            <button id="qr-edit-client" class="btn btn-primary" style="display: none;">Editar Cliente</button>
+                            <button id="qr-register-client" class="btn btn-success" style="display: none;">Registrar Cliente</button>
+                        </div>
+                    </div>
+                    <div id="qr-error" class="qr-error" style="display: none;">
+                        <h3>Erro no QR Code</h3>
+                        <p id="qr-error-message"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Atendimento -->
+    <div id="atendimento-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="atendimento-modal-title">Novo Atendimento</h2>
+                <span class="close" data-modal="atendimento-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="atendimento-form">
+                    <input type="hidden" id="atendimento-id">
+                    <div class="form-group">
+                        <label for="atendimento-client-search">Buscar Cliente (Nome, Telefone ou CPF/CNPJ):</label>
+                        <input type="text" id="atendimento-client-search" placeholder="Digite para buscar...">
+                        <div id="client-search-results" style="display: none; border: 1px solid #ddd; max-height: 200px; overflow-y: auto; margin-top: 5px;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="atendimento-client">Cliente Selecionado:</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="text" id="atendimento-client-display" readonly placeholder="Nenhum cliente selecionado" style="flex: 1; background: #f5f5f5;">
+                            <input type="hidden" id="atendimento-client" required>
+                            <button type="button" id="add-client-btn" class="btn btn-success" style="white-space: nowrap;">+ Novo Cliente</button>
+                            <button type="button" id="scan-qr-client-btn" class="btn btn-info" style="white-space: nowrap;">📷 Escanear QR</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="atendimento-summary">Descrição do Serviço:</label>
+                        <textarea id="atendimento-summary" required placeholder="Descreva o problema ou serviço necessário..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="atendimento-date">Data do Atendimento:</label>
+                        <input type="text" id="atendimento-date" required placeholder="dd/mm/aaaa" pattern="\d{2}/\d{2}/\d{4}" title="Formato: dd/mm/aaaa">
+                    </div>
+                    <div class="form-group">
+                        <label for="atendimento-time">Hora do Atendimento:</label>
+                        <input type="text" id="atendimento-time" required placeholder="HH:mm" pattern="\d{2}:\d{2}" title="Formato: HH:mm">
+                    </div>
+                    <div class="form-group">
+                        <label for="atendimento-priority">Prioridade:</label>
+                        <select id="atendimento-priority">
+                            <option value="baixa">Baixa</option>
+                            <option value="média" selected>Média</option>
+                            <option value="alta">Alta</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="atendimento-status">Status:</label>
+                        <select id="atendimento-status" required>
+                            <option value="pendente">Pendente</option>
+                            <option value="aguardando_orcamento">Aguardando Orçamento</option>
+                            <option value="aguardando_pecas">Aguardando Peças</option>
+                            <option value="em_manutencao">Em Manutenção</option>
+                            <option value="periodo_testes">Período de Testes</option>
+                            <option value="aparelho_pronto">Aparelho Pronto</option>
+                            <option value="reprovado_esperando_devolucao">Reprovado - Esperando Devolução</option>
+                            <option value="aguardando_visita_tecnica">Aguardando Visita Técnica</option>
+                            <option value="aparelho_a_caminho">Aparelho a Caminho</option>
+                            <option value="atendimento_finalizado">Atendimento Finalizado</option>
+                            <option value="recusado">Recusado</option>
+                            <option value="os_criada">OS Criada</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" data-close="atendimento-modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal OS -->
+    <div id="os-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="os-modal-title">Nova OS</h2>
+                <span class="close" data-modal="os-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="os-form">
+                    <input type="hidden" id="os-id">
+                    <div class="form-group">
+                        <label for="os-client">Cliente:</label>
+                        <select id="os-client" required>
+                            <option value="">Selecione um cliente</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="os-summary">Sumário do Serviço:</label>
+                        <textarea id="os-summary" required placeholder="Descreva o trabalho a ser realizado..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="os-technician">Técnico Responsável:</label>
+                        <input type="text" id="os-technician" placeholder="Nome do técnico">
+                    </div>
+                    <div class="form-group">
+                        <label for="os-status">Status da OS:</label>
+                        <select id="os-status">
+                            <option value="pendente">Pendente</option>
+                            <option value="aguardando_assinatura">Aguardando Assinatura</option>
+                            <option value="aguardando_orcamento">Aguardando Orçamento</option>
+                            <option value="aguardando_pecas">Aguardando Peças</option>
+                            <option value="em_manutencao">Em Manutenção</option>
+                            <option value="aparelho_pronto">Aparelho Pronto</option>
+                            <option value="reprovado_esperando_devolucao">Reprovado - Esperando Devolução</option>
+                            <option value="aguardando_visita_tecnica">Aguardando Visita Técnica</option>
+                            <option value="aparelho_a_caminho">Aparelho a Caminho</option>
+                            <option value="pending">Pendente (Aguardando Execução)</option>
+                            <option value="signed">Assinada (Cliente Aprovou)</option>
+                            <option value="awaiting_payment">Aguardando Pagamento</option>
+                            <option value="paid">Paga (Pagamento Confirmado)</option>
+                            <option value="finalized">Finalizada (Concluída)</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" data-close="os-modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Assinatura -->
+    <div id="signature-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Assinar OS</h2>
+                <span class="close" data-modal="signature-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="signature-info"></div>
+                <div class="signature-area">
+                    <p>Assinatura do cliente (simulado):</p>
+                    <canvas id="signature-canvas" width="400" height="150"></canvas>
+                    <div class="signature-controls">
+                        <button id="clear-signature" class="btn btn-secondary">Limpar</button>
+                        <button id="save-signature" class="btn btn-primary">Salvar Assinatura</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Pagamento -->
+    <div id="payment-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Enviar para Pagamento</h2>
+                <span class="close" data-modal="payment-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="payment-info"></div>
+                <form id="payment-form">
+                    <input type="hidden" id="payment-os-id">
+                    <div class="form-group">
+                        <label for="payment-amount">Valor Total (R$):</label>
+                        <input type="number" id="payment-amount" step="0.01" min="0" required placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="payment-method">Método de Pagamento:</label>
+                        <select id="payment-method">
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="PIX">PIX</option>
+                            <option value="Cartão de Crédito">Cartão de Crédito</option>
+                            <option value="Cartão de Débito">Cartão de Débito</option>
+                            <option value="Boleto">Boleto Bancário</option>
+                            <option value="Transferência">Transferência Bancária</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="payment-notes">Observações:</label>
+                        <textarea id="payment-notes" placeholder="Instruções de pagamento, descontos, etc..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" data-close="payment-modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Enviar para Cobrança</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Visualização de OS -->
+    <div id="view-os-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>Detalhes da OS</h2>
+                <span class="close" data-modal="view-os-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="view-os-details"></div>
+                <hr>
+                <h3>Histórico de Status</h3>
+                <div id="view-os-history" style="max-height: 300px; overflow-y: auto;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-close="view-os-modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Lista Expandida -->
+    <div id="expanded-list-modal" class="modal">
+        <div class="modal-content" style="max-width: 95%; max-height: 90vh;">
+            <div class="modal-header">
+                <h2 id="expanded-list-title">Lista Completa</h2>
+                <span class="close" data-modal="expanded-list-modal">&times;</span>
+            </div>
+            <div class="modal-body" style="max-height: calc(90vh - 120px); overflow-y: auto;">
+                <div id="expanded-list-filters" style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                <div id="expanded-list-content"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-close="expanded-list-modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Pagamento -->
+    <div id="confirm-payment-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Confirmar Pagamento</h2>
+                <span class="close" data-modal="confirm-payment-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="confirm-payment-info"></div>
+                <div class="confirmation-box">
+                    <p><strong>⚠️ Atenção!</strong></p>
+                    <p>Confirme que o pagamento foi recebido e processado antes de continuar.</p>
+                    <p>Esta ação irá mover a OS para a lista de "Pagas" e permitirá a finalização.</p>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" data-close="confirm-payment-modal">Cancelar</button>
+                    <button id="confirm-payment-btn" class="btn btn-success">Confirmar Pagamento</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Cliente (para QR Code e Novo Cliente) -->
+    <div id="client-modal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2 id="client-modal-title">Novo Cliente</h2>
+                <span class="close" data-modal="client-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="client-form">
+                    <input type="hidden" id="client-id">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <!-- Coluna 1: Dados do Cliente -->
+                        <div>
+                            <h3 style="margin-top: 0;">Dados do Cliente</h3>
+                            <div class="form-group">
+                                <label for="client-name">Nome Completo: *</label>
+                                <input type="text" id="client-name" required placeholder="Nome completo do cliente">
+                            </div>
+                            <div class="form-group">
+                                <label for="client-phone">Telefone: *</label>
+                                <input type="tel" id="client-phone" required placeholder="(00) 00000-0000">
+                            </div>
+                            <div class="form-group">
+                                <label for="client-cpf-cnpj">CPF ou CNPJ:</label>
+                                <input type="text" id="client-cpf-cnpj" placeholder="000.000.000-00 ou 00.000.000/0000-00">
+                            </div>
+                            <div class="form-group">
+                                <label for="client-email">Email:</label>
+                                <input type="email" id="client-email" placeholder="email@exemplo.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="client-address">Endereço:</label>
+                                <textarea id="client-address" placeholder="Rua, número, bairro, cidade..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Coluna 2: Aparelhos Vinculados -->
+                        <div>
+                            <h3 style="margin-top: 0;">Aparelhos Vinculados</h3>
+                            <div id="client-devices-section" style="display: none;">
+                                <div style="margin-bottom: 10px;">
+                                    <button type="button" id="add-device-to-client-btn" class="btn btn-success btn-sm">+ Adicionar Aparelho</button>
+                                    <button type="button" id="link-existing-device-btn" class="btn btn-info btn-sm">🔗 Vincular Existente</button>
+                                </div>
+                                <div id="client-devices-list" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 10px;">
+                                    <p style="text-align: center; color: #666;">Nenhum aparelho vinculado</p>
+                                </div>
+                            </div>
+                            <div id="client-devices-new-message" style="color: #666; font-style: italic;">
+                                Salve o cliente primeiro para adicionar aparelhos
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions" style="margin-top: 20px; grid-column: 1 / -1;">
+                        <button type="button" class="btn btn-secondary" data-close="client-modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Cliente</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Vincular Aparelho Existente -->
+    <div id="link-device-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Vincular Aparelho Existente</h2>
+                <span class="close" data-modal="link-device-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Selecione um aparelho disponível para vincular ao cliente:</p>
+                <div id="available-devices-list" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 10px;">
+                    <p style="text-align: center; color: #666;">Carregando...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Fotos de Entrada -->
+    <div id="fotos-entrada-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>📷 Fotos de Entrada do Aparelho</h2>
+                <span class="close" data-modal="fotos-entrada-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="fotos-entrada-item-id">
+                <div style="margin-bottom: 20px;">
+                    <h3>Cliente: <span id="fotos-entrada-cliente"></span></h3>
+                    <p><strong>Aparelho:</strong> <span id="fotos-entrada-aparelho"></span></p>
+                    <p><strong>Serial:</strong> <span id="fotos-entrada-serial"></span></p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fotos-entrada-upload">📸 Adicionar Fotos de Entrada:</label>
+                    <input type="file" id="fotos-entrada-upload" accept="image/*" multiple style="margin-top: 10px;">
+                    <small style="display: block; margin-top: 5px; color: #666;">Você pode selecionar múltiplas fotos</small>
+                    <div id="fotos-entrada-preview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 15px;"></div>
+                </div>
+
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="fotos-entrada-obs">📝 Observações (itens faltantes, defeitos visíveis, etc.):</label>
+                    <textarea id="fotos-entrada-obs" rows="4" placeholder="Ex: Faltando tampa traseira, tela trincada no canto superior direito, aparelho não liga..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" data-close="fotos-entrada-modal">Fechar</button>
+                    <button type="button" id="salvar-fotos-entrada-btn" class="btn btn-primary">💾 Salvar Fotos e Observações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Fotos de Saída -->
+    <div id="fotos-saida-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>📷 Fotos de Saída do Aparelho</h2>
+                <span class="close" data-modal="fotos-saida-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="fotos-saida-item-id">
+                <div style="margin-bottom: 20px;">
+                    <h3>Cliente: <span id="fotos-saida-cliente"></span></h3>
+                    <p><strong>Aparelho:</strong> <span id="fotos-saida-aparelho"></span></p>
+                    <p><strong>Serial:</strong> <span id="fotos-saida-serial"></span></p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fotos-saida-upload">📸 Adicionar Fotos de Saída:</label>
+                    <input type="file" id="fotos-saida-upload" accept="image/*" multiple style="margin-top: 10px;">
+                    <small style="display: block; margin-top: 5px; color: #666;">Você pode selecionar múltiplas fotos</small>
+                    <div id="fotos-saida-preview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 15px;"></div>
+                </div>
+
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="fotos-saida-obs">📝 Observações (estado final, reparos realizados, testes, etc.):</label>
+                    <textarea id="fotos-saida-obs" rows="4" placeholder="Ex: Tela substituída e testada, aparelho funcionando perfeitamente, bateria com 100% de saúde..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" data-close="fotos-saida-modal">Fechar</button>
+                    <button type="button" id="salvar-fotos-saida-btn" class="btn btn-primary">💾 Salvar Fotos e Observações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Listagem de Clientes -->
+    <div id="clients-list-modal" class="modal">
+        <div class="modal-content" style="max-width: 95%; max-height: 90vh;">
+            <div class="modal-header">
+                <h2>👥 Gerenciar Clientes</h2>
+                <span class="close" data-modal="clients-list-modal">&times;</span>
+            </div>
+            <div class="modal-body" style="max-height: calc(90vh - 120px); overflow-y: auto;">
+                <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
+                    <input type="text" id="search-clients-list" placeholder="Buscar por nome, telefone, CPF..." style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <button id="refresh-clients-list" class="btn btn-secondary">Atualizar</button>
+                    <button id="add-new-client-btn" class="btn btn-success">+ Novo Cliente</button>
+                </div>
+                
+                <div class="table-container">
+                    <table id="clients-list-table">
+                        <thead>
+                            <tr>
+                                <th>QR Code</th>
+                                <th>Nome</th>
+                                <th>Telefone</th>
+                                <th>CPF/CNPJ</th>
+                                <th>Email</th>
+                                <th>Aparelhos</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clients-list-tbody">
+                        </tbody>
+                    </table>
+                    <div id="clients-list-loading" class="loading">Carregando...</div>
+                    <div id="clients-list-empty" class="empty-state" style="display: none;">
+                        Nenhum cliente cadastrado
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Visualização de Fotos da OS -->
+    <div id="view-os-fotos-modal" class="modal">
+        <div class="modal-content" style="max-width: 1200px; max-height: 90vh;">
+            <div class="modal-header">
+                <h2>📷 Fotos da Ordem de Serviço</h2>
+                <span class="close" data-modal="view-os-fotos-modal">&times;</span>
+            </div>
+            <div class="modal-body" style="max-height: calc(90vh - 120px); overflow-y: auto;">
+                <div style="margin-bottom: 20px;">
+                    <h3>OS: <span id="view-fotos-os-id"></span></h3>
+                    <p><strong>Cliente:</strong> <span id="view-fotos-cliente"></span></p>
+                    <p><strong>Aparelho:</strong> <span id="view-fotos-aparelho"></span></p>
+                </div>
+                
+                <div id="view-fotos-entrada-section" style="margin-bottom: 30px;">
+                    <h3 style="color: #2196F3; border-bottom: 2px solid #2196F3; padding-bottom: 10px;">📥 Fotos de Entrada</h3>
+                    <div id="view-fotos-entrada-gallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;"></div>
+                    <div id="view-fotos-entrada-obs" style="margin-top: 15px; padding: 15px; background: #f5f5f5; border-radius: 8px;"></div>
+                    <div id="view-fotos-entrada-empty" style="padding: 20px; text-align: center; color: #999; display: none;">Nenhuma foto de entrada cadastrada</div>
+                </div>
+                
+                <div id="view-fotos-saida-section">
+                    <h3 style="color: #4CAF50; border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">📤 Fotos de Saída</h3>
+                    <div id="view-fotos-saida-gallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;"></div>
+                    <div id="view-fotos-saida-obs" style="margin-top: 15px; padding: 15px; background: #f5f5f5; border-radius: 8px;"></div>
+                    <div id="view-fotos-saida-empty" style="padding: 20px; text-align: center; color: #999; display: none;">Nenhuma foto de saída cadastrada</div>
+                </div>
+                
+                <div class="form-actions" style="margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" data-close="view-os-fotos-modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Scripts -->
+    <script src="auth.js"></script>
+    <script src="qr-utils.js"></script>
+    <script src="os-dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Item</title>
+    <link rel="stylesheet" href="registrar.css"> 
+</head>
+<body>
+    <div class="header-simple">
+        <h1><a href="dashboard.html" class="home-link">← Voltar ao Painel</a></h1>
+    </div>
+    <div class="container">
+        <div class="form-section">
+            <h2>Registrar Novo Item Vendido</h2>
+            <input type="text" id="customerName" placeholder="Nome do Cliente">
+            <input type="text" id="customerContact" placeholder="Contato do Cliente (Número de Celular)">
+            <input type="text" id="itemDescription" placeholder="Descrição do Item (ex: Emissor, Placa, Ultrassom...)">
+            <input type="text" id="serialNumber" placeholder="Número de Série">
+            <label for="saleDate">Data da Venda/Serviço:</label>
+            <input type="date" id="saleDate">
+            <label for="warrantyDate">Data Final da Garantia:</label>
+            <input type="date" id="warrantyDate">
+            <textarea id="notes" placeholder="Observações..."></textarea>
+            <button id="saveButton">Salvar e Gerar QR Code</button>
+        </div>
+        <div class="qr-section">
+            <h2>QR Code do Registro</h2>
+            <div id="qrcode-container">
+                <div id="qrcode"></div>
+                <p id="qr-message">Preencha e salve para gerar.</p>
+            </div>
+            <a id="download-link" class="button-download" style="display: none;">Baixar QR Code</a>
+        </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script src="registrar.js"></script>
+</body>
+</html>

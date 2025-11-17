@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Aparelhos</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="os-dashboard.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+</head>
+<body>
+    <div id="sidebar" class="sidebar">
+        <h2>Menu</h2>
+        <nav>
+            <a href="os-dashboard.html">Dashboard OS</a>
+            <a href="aparelhos.html" class="active">Gerenciar Aparelhos</a>
+            <a href="dashboard.html">Painel Principal</a>
+            <a href="registrar.html">Registrar Venda</a>
+            <a href="entrada.html">Entrada de Reparo</a>
+            <a href="atendimentos.html">Atendimentos</a>
+            <a href="clientes.html">Clientes</a>
+            <a href="estoque.html">Estoque</a>
+            <a href="financeiro.html">Financeiro</a>
+        </nav>
+        <div class="user-info">
+            <span id="userEmail"></span>
+            <button id="logoutButton">Sair</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <button id="menu-toggle">☰</button>
+            <h1>Gerenciar Aparelhos</h1>
+            <div class="header-actions">
+                <button id="new-device-btn" class="btn btn-success">+ Novo Aparelho</button>
+                <button id="scan-device-qr-btn" class="btn btn-info">📷 Escanear QR</button>
+            </div>
+        </header>
+
+        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 30px;">
+            <div class="stat-card">
+                <h3>Total de Aparelhos</h3>
+                <div class="stat-number" id="stat-total-devices">0</div>
+                <small>Cadastrados no sistema</small>
+            </div>
+            <div class="stat-card">
+                <h3>Com Proprietário</h3>
+                <div class="stat-number" id="stat-devices-with-owner">0</div>
+                <small>Vinculados a clientes</small>
+            </div>
+            <div class="stat-card">
+                <h3>Sem Proprietário</h3>
+                <div class="stat-number" id="stat-devices-without-owner">0</div>
+                <small>Disponíveis para venda</small>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Lista de Aparelhos</h2>
+                <div class="panel-controls">
+                    <input type="text" id="search-devices" placeholder="Buscar por marca, modelo, serial, QR..." style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 300px;">
+                    <select id="filter-device-owner" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="">Todos</option>
+                        <option value="with-owner">Com Proprietário</option>
+                        <option value="without-owner">Sem Proprietário</option>
+                    </select>
+                    <button id="refresh-devices" class="btn btn-secondary">Atualizar</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="devices-table">
+                    <thead>
+                        <tr>
+                            <th>QR Code</th>
+                            <th>Marca</th>
+                            <th>Modelo</th>
+                            <th>Serial</th>
+                            <th>Proprietário</th>
+                            <th>Data Cadastro</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="devices-tbody">
+                    </tbody>
+                </table>
+                <div id="devices-loading" class="loading">Carregando...</div>
+                <div id="devices-empty" class="empty-state" style="display: none;">
+                    Nenhum aparelho cadastrado
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Aparelho -->
+    <div id="device-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="device-modal-title">Novo Aparelho</h2>
+                <span class="close" data-modal="device-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="device-form">
+                    <input type="hidden" id="device-id">
+                    <div class="form-group">
+                        <label for="device-brand">Marca: *</label>
+                        <input type="text" id="device-brand" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="device-model">Modelo: *</label>
+                        <input type="text" id="device-model" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="device-imei">Número de Série:</label>
+                        <input type="text" id="device-imei">
+                    </div>
+                    <div class="form-group">
+                        <label for="device-owner">Proprietário (Cliente):</label>
+                        <select id="device-owner">
+                            <option value="">Sem proprietário (disponível para venda)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="device-notes">Observações:</label>
+                        <textarea id="device-notes"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" data-close="device-modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal QR Code Scanner -->
+    <div id="device-qr-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Escanear QR Code do Aparelho</h2>
+                <span class="close" data-modal="device-qr-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="qr-input-section">
+                    <label for="device-qr-input">Cole o código QR do aparelho:</label>
+                    <textarea id="device-qr-input"></textarea>
+                    <button id="process-device-qr-btn" class="btn btn-primary">Processar QR Code</button>
+                </div>
+                <div id="device-qr-result" class="qr-result" style="display: none;">
+                    <div id="device-qr-success" class="qr-success" style="display: none;">
+                        <h3>Aparelho encontrado!</h3>
+                        <div id="device-qr-info"></div>
+                    </div>
+                    <div id="device-qr-error" class="qr-error" style="display: none;">
+                        <h3>Erro</h3>
+                        <p id="device-qr-error-message"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Scripts -->
+    <script src="auth.js"></script>
+    <script src="aparelhos.js"></script>
+</body>
+</html>

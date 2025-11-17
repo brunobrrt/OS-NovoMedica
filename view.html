@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Item - Controle de Assistência</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="view.css">
+</head>
+<body>
+    <div id="sidebar" class="sidebar">
+        <h2>Menu</h2>
+        <nav>
+            <a href="dashboard.html">Painel de Controle</a>
+            <a href="registrar.html">Registrar Venda</a>
+            <a href="entrada.html">Entrada Avulsa de Reparo</a>
+            <a href="atendimentos.html">Atendimentos Ativos</a>
+            <a href="visitas.html">Aguardando Visita Técnica</a>
+            <a href="remoto.html">Atendimento Remoto</a>
+            <a href="cursos.html">Cursos e Eventos</a>
+            <a href="garantia.html">Itens na Garantia</a>
+            <a href="acaminho.html">Aparelhos a Caminho</a>
+            <a href="historico.html">Histórico Geral (O.S.)</a>
+            <a href="clientes.html">Lista de Clientes</a>
+            <a href="estoque.html">Estoque</a>
+            <a href="financeiro.html">Financeiro</a>
+        </nav>
+        <div class="user-info">
+            <span id="userEmail"></span>
+            <button id="logoutButton">Sair</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <button id="menu-toggle">☰</button>
+            <h1>Ficha do Item: <span id="headerItemDesc"></span></h1>
+        </header>
+        
+        <div class="view-container">
+            <div class="actions-bar">
+                <button id="start-service-button" class="action-button-green" style="display: none;">Dar Entrada para Manutenção</button>
+                <div id="admin-actions" class="admin-actions" style="display: none;">
+                    <button id="generate-quote-button" class="action-button-blue">Gerar Orçamento</button>
+                    <button id="edit-item-button" class="action-button-yellow">Editar Item</button>
+                    <button id="delete-item-button" class="action-button-red">Excluir Item</button>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h2>Informações de Registro</h2>
+                <div class="info-grid">
+                    <div><strong>Cliente:</strong> <span id="info-clienteNome"></span></div>
+                    <div><strong>Contato:</strong> <span id="info-clienteContato"></span></div>
+                    <div><strong>Descrição:</strong> <span id="info-itemDescricao"></span></div>
+                    <div><strong>Nº de Série:</strong> <span id="info-itemSerial"></span></div>
+                    <div><strong>Data da Venda:</strong> <span id="info-dataVenda"></span></div>
+                    <div><strong>Fim da Garantia:</strong> <span id="info-dataGarantia"></span></div>
+                </div>
+            </div>
+
+            <div id="service-section" class="service-section" style="display: none;">
+                <h2>Área de Atendimento</h2>
+                <select id="statusSelect">
+                    <option value="Pendente">Pendente</option>
+                    <option value="Aguardando Orçamento">Aguardando Orçamento</option>
+                    <option value="Aguardando Peças">Aguardando Peças</option>
+                    <option value="Em Manutenção">Em Manutenção</option>
+                    <option value="Pronto para Retirada">Pronto para Retirada</option>
+                    <option value="Reprovado - Aguardando Devolução">Reprovado - Aguardando Devolução</option>
+                    <option value="Finalizado e Entregue">Finalizado e Entregue</option>
+                </select>
+                <div id="admin-value-field" style="display: none;">
+                    <label for="serviceValue">Valor do Serviço/Orçamento (R$):</label>
+                    <input type="text" inputmode="decimal" id="serviceValue" placeholder="Ex: 1250,50">
+                </div>
+                <textarea id="serviceNotes" placeholder="Adicionar observação ao histórico..."></textarea>
+                <button id="saveStatusButton">Salvar Atualização</button>
+            </div>
+            
+            <div class="history-section">
+                <h2>Histórico de Ordens de Serviço</h2>
+                <div id="historyList"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="checkin-modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Dar Entrada para Manutenção</h2>
+            <div class="form-row">
+                <div><label for="checkin-date">Data de Entrada:</label><input type="date" id="checkin-date"></div>
+                <div><label for="checkin-time">Hora de Entrada:</label><input type="time" id="checkin-time"></div>
+            </div>
+            <label for="received-by">Recebido Por:</label><input type="text" id="received-by" placeholder="Nome do funcionário">
+            <label for="defect-reported">Defeito Relatado:</label><textarea id="defect-reported" placeholder="Cliente informou que..."></textarea>
+            <label for="accessories">Acessórios Deixados:</label><input type="text" id="accessories" placeholder="Carregador, cabo, etc...">
+            <div class="modal-buttons">
+                <button id="cancel-checkin-button">Cancelar</button>
+                <button id="save-checkin-button">Confirmar Entrada e Gerar O.S.</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="edit-modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Editar Informações de Registro</h2>
+            <label for="edit-customerName">Nome do Cliente:</label><input type="text" id="edit-customerName">
+            <label for="edit-customerContact">Contato:</label><input type="text" id="edit-customerContact">
+            <label for="edit-itemDescription">Descrição do Item:</label><input type="text" id="edit-itemDescription">
+            <label for="edit-serialNumber">Nº de Série:</label><input type="text" id="edit-serialNumber">
+            <div class="modal-buttons">
+                <button id="cancel-edit-button">Cancelar</button>
+                <button id="save-edit-button">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+   <div id="quote-modal-overlay" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Revisar e Gerar Orçamento</h2>
+
+        <label for="quote-services">Descrição dos Serviços (Escreva tudo que será feito, além do defeito relatado e acessórios que vieram):</label>
+        <textarea id="quote-services" rows="6"></textarea>
+
+        <label for="quote-value">Valor Final (R$):</label>
+        <input type="text" inputmode="decimal" id="quote-value">
+
+        <div class="modal-buttons">
+            <button id="cancel-quote-button">Cancelar</button>
+            <button id="generate-pdf-final-button">Gerar O.S. Final</button>
+        </div>
+     </div>
+   </div>
+    <div id="overlay" class="overlay"></div>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="view.js"></script>
+</body>
+</html>

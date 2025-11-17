@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atendimentos Ativos - Controle de Assistência</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="atendimentos.css">
+</head>
+<body>
+    <div id="sidebar" class="sidebar">
+        <h2>Menu</h2>
+        <nav>
+            <a href="dashboard.html">Painel de Controle</a>
+            <a href="registrar.html">Registrar Venda</a>
+            <a href="entrada.html">Entrada Avulsa de Reparo</a>
+            <a href="atendimentos.html" class="active" >Atendimentos Ativos</a>
+            <a href="visitas.html">Aguardando Visita Técnica</a>
+            <a href="remoto.html">Atendimento Remoto</a>
+            <a href="cursos.html"">Cursos e Eventos</a>
+            <a href="garantia.html">Itens na Garantia</a>
+            <a href="acaminho.html">Aparelhos a Caminho</a>
+            <a href="historico.html">Histórico Geral (O.S.)</a>
+            <a href="clientes.html">Lista de Clientes</a>
+            <a href="estoque.html">Estoque</a>
+            <a href="financeiro.html">Financeiro</a>
+        </nav>
+        <div class="user-info">
+            <span id="userEmail"></span>
+            <button id="logoutButton">Sair</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <button id="menu-toggle">☰</button>
+            <h1>Atendimentos Ativos</h1>
+        </header>
+        
+        <div class="content-body">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Buscar por cliente, descrição, O.S. ou status...">
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Descrição do Item</th>
+                            <th>Nº da O.S.</th>
+                            <th>Status Atual</th>
+                            <th>Data de Entrada</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="overlay" class="overlay"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+    <script src="atendimentos.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+.container-visitas { display: flex; gap: 30px; padding: 30px; align-items: flex-start; flex-wrap: wrap; }
+.form-section-visita { flex: 1; min-width: 350px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.list-section-visita { flex: 2; min-width: 400px; }
+.table-container { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.form-section-visita input, .form-section-visita textarea, .form-section-visita button { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+.form-section-visita button { background-color: #007bff; color: white; font-weight: bold; cursor: pointer; }
+table { width: 100%; border-collapse: collapse; }
+table thead { background-color: #f8f9fa; }
+table th, table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #dee2e6; }
+.action-button { background-color: #28a745; color: white; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }

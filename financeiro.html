@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financeiro - Gestão</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="financeiro.css">
+</head>
+<body>
+    <div id="sidebar" class="sidebar">
+        <h2>Menu</h2>
+        <nav>
+            <a href="dashboard.html">Painel de Controle</a>
+            <a href="registrar.html">Registrar Venda</a>
+            <a href="entrada.html">Entrada Avulsa de Reparo</a>
+            <a href="atendimentos.html">Atendimentos Ativos</a>
+            <a href="historico.html">Histórico Geral (O.S.)</a>
+            <a href="garantia.html">Itens na Garantia</a>
+            <a href="visitas.html">Aguardando Visita Técnica</a>
+            <a href="remoto.html">Atendimento Remoto</a>
+            <a href="cursos.html">Cursos</a>
+            <a href="acaminho.html">Aparelhos a Caminho</a>
+            <a href="clientes.html">Lista de Clientes</a>
+            <a href="estoque.html">Estoque</a>
+            <a href="financeiro.html" class="active">Financeiro</a> </nav>
+        <div class="user-info">
+            <span id="userEmail"></span>
+            <button id="logoutButton">Sair</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <button id="menu-toggle">☰</button>
+            <h1>Painel Financeiro</h1>
+        </header>
+        
+        <div class="container-financeiro">
+            <div class="summary-cards">
+                </div>
+
+            <div class="list-section-financeiro">
+                <h3>Registros de Vendas e Serviços</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Cliente</th>
+                                <th>Descrição</th>
+                                <th>Valor (R$)</th>
+                                <th>Status Pagamento</th>
+                                <th>Vendedor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="financialTableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="overlay" class="overlay"></div>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+    <script src="financeiro.js"></script>
+</body>
+</html>
