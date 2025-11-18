@@ -676,7 +676,7 @@ class OSDashboard {
             <td>${item.summary || 'N/A'}</td>
             <td>
                 <button class="btn btn-sm ${fotosCount > 0 ? 'btn-success' : 'btn-warning'}" onclick="dashboard.openFotosEntrada('${item.id}')">${fotosStatus}</button>
-                ${fotosCount > 0 ? `<button class="btn btn-sm btn-info" onclick="dashboard.viewAtendimentoFotos('${item.id}')" title="Ver fotos">👁️</button>` : ''}
+                ${fotosCount > 0 ? `<button class="btn btn-sm btn-info" onclick="dashboard.viewAtendimentoFotos('${item.id}')" title="Ver fotos">Ver Foto</button>` : ''}
             </td>
             <td>
                 <div class="action-buttons">
