@@ -20,6 +20,61 @@ class OSDashboard {
         this.setupEventListeners();
         this.initSignatureCanvas();
         this.loadInitialData();
+        this.setupMobileMenu();
+    }
+
+    setupMobileMenu() {
+        // Setup menu toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        
+        if (menuToggle && sidebar && overlay) {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            });
+            
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+                this.closeMobileActionsMenu();
+            });
+        }
+        
+        // Setup mobile actions menu
+        const mobileActionsBtn = document.getElementById('mobile-actions-btn');
+        const mobileActionsMenu = document.getElementById('mobile-actions-menu');
+        
+        if (mobileActionsBtn && mobileActionsMenu) {
+            mobileActionsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                mobileActionsMenu.classList.toggle('show');
+                overlay.classList.toggle('active');
+            });
+        }
+        
+        // Close mobile actions menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (mobileActionsMenu && !mobileActionsMenu.contains(e.target) && e.target.id !== 'mobile-actions-btn') {
+                this.closeMobileActionsMenu();
+            }
+        });
+    }
+
+    closeMobileActionsMenu() {
+        const mobileActionsMenu = document.getElementById('mobile-actions-menu');
+        const overlay = document.getElementById('overlay');
+        
+        if (mobileActionsMenu) {
+            mobileActionsMenu.classList.remove('show');
+        }
+        
+        // Only remove overlay if sidebar is not open
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar && !sidebar.classList.contains('open')) {
+            overlay.classList.remove('active');
+        }
     }
 
     initializeAuth() {
@@ -67,11 +122,31 @@ class OSDashboard {
 
     setupEventListeners() {
         // Botões principais
-        document.getElementById('qr-scan-btn').addEventListener('click', () => this.openQRModal());
-        document.getElementById('manage-devices-btn').addEventListener('click', () => window.location.href = 'aparelhos.html');
-        document.getElementById('manage-clients-btn').addEventListener('click', () => this.openClientsListModal());
-        document.getElementById('new-atendimento-btn').addEventListener('click', () => this.openAtendimentoModal());
-        document.getElementById('new-os-btn').addEventListener('click', () => this.openOSModal());
+        const qrBtn = document.getElementById('qr-scan-btn');
+        const devicesBtn = document.getElementById('manage-devices-btn');
+        const clientsBtn = document.getElementById('manage-clients-btn');
+        const atendimentoBtn = document.getElementById('new-atendimento-btn');
+        const osBtn = document.getElementById('new-os-btn');
+        
+        if (qrBtn) qrBtn.addEventListener('click', () => { this.openQRModal(); this.closeMobileActionsMenu(); });
+        if (devicesBtn) devicesBtn.addEventListener('click', () => window.location.href = 'aparelhos.html');
+        if (clientsBtn) clientsBtn.addEventListener('click', () => { this.openClientsListModal(); this.closeMobileActionsMenu(); });
+        if (atendimentoBtn) atendimentoBtn.addEventListener('click', () => { this.openAtendimentoModal(); this.closeMobileActionsMenu(); });
+        if (osBtn) osBtn.addEventListener('click', () => { this.openOSModal(); this.closeMobileActionsMenu(); });
+        
+        // Botões mobile (duplicados)
+        const mobileQrBtn = document.getElementById('mobile-qr-scan-btn');
+        const mobileDevicesBtn = document.getElementById('mobile-manage-devices-btn');
+        const mobileClientsBtn = document.getElementById('mobile-manage-clients-btn');
+        const mobileAtendimentoBtn = document.getElementById('mobile-new-atendimento-btn');
+        const mobileOsBtn = document.getElementById('mobile-new-os-btn');
+        
+        if (mobileQrBtn) mobileQrBtn.addEventListener('click', () => { this.openQRModal(); this.closeMobileActionsMenu(); });
+        if (mobileDevicesBtn) mobileDevicesBtn.addEventListener('click', () => window.location.href = 'aparelhos.html');
+        if (mobileClientsBtn) mobileClientsBtn.addEventListener('click', () => { this.openClientsListModal(); this.closeMobileActionsMenu(); });
+        if (mobileAtendimentoBtn) mobileAtendimentoBtn.addEventListener('click', () => { this.openAtendimentoModal(); this.closeMobileActionsMenu(); });
+        if (mobileOsBtn) mobileOsBtn.addEventListener('click', () => { this.openOSModal(); this.closeMobileActionsMenu(); });
+        
         document.getElementById('add-client-btn').addEventListener('click', () => this.openNewClientModal());
         document.getElementById('scan-qr-client-btn').addEventListener('click', () => this.openQRModalForAtendimento());
 
@@ -157,8 +232,7 @@ class OSDashboard {
         
         this.signatureCanvas.addEventListener('mousedown', (e) => this.startDrawing(e));
         this.signatureCanvas.addEventListener('mousemove', (e) => this.draw(e));
-        this.signatureCanvas.addEventListener('mouseup', () => this.stopDrawing());
-        this.signatureCanvas.addEventListener('mouseout', () => this.stopDrawing());
+        this.signatureCanvas.addEventListener('mouseup', () => this.stopDrawing());        this.signatureCanvas.addEventListener('mouseout', () => this.stopDrawing());
 
         // Touch events para mobile
         this.signatureCanvas.addEventListener('touchstart', (e) => {

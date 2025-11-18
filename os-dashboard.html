@@ -48,7 +48,46 @@
                 <button id="new-atendimento-btn" class="btn btn-success">+ Novo Atendimento</button>
                 <button id="new-os-btn" class="btn btn-info">+ Nova OS</button>
             </div>
+            
+            <!-- Botão de Menu Mobile -->
+            <button id="mobile-actions-btn" class="mobile-actions-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="5" r="2"/>
+                    <circle cx="12" cy="12" r="2"/>
+                    <circle cx="12" cy="19" r="2"/>
+                </svg>
+            </button>
         </header>
+        
+        <!-- Menu Mobile Popup -->
+        <div id="mobile-actions-menu" class="mobile-actions-menu">
+            <button id="mobile-qr-scan-btn" class="mobile-menu-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 5a2 2 0 012-2h5v2H5v5H3V5zM3 19v-5h2v5h5v2H5a2 2 0 01-2-2zM21 19a2 2 0 01-2 2h-5v-2h5v-5h2v5zM21 5v5h-2V5h-5V3h5a2 2 0 012 2z"/>
+                    <rect x="9" y="9" width="1.5" height="1.5"/>
+                    <rect x="13.5" y="9" width="1.5" height="1.5"/>
+                    <rect x="9" y="13.5" width="1.5" height="1.5"/>
+                    <rect x="13.5" y="13.5" width="1.5" height="1.5"/>
+                </svg>
+                <span>Processar QR</span>
+            </button>
+            <button id="mobile-manage-devices-btn" class="mobile-menu-item">
+                <span class="mobile-menu-icon">📱</span>
+                <span>Aparelhos</span>
+            </button>
+            <button id="mobile-manage-clients-btn" class="mobile-menu-item">
+                <span class="mobile-menu-icon">👥</span>
+                <span>Clientes</span>
+            </button>
+            <button id="mobile-new-atendimento-btn" class="mobile-menu-item">
+                <span class="mobile-menu-icon">+</span>
+                <span>Novo Atendimento</span>
+            </button>
+            <button id="mobile-new-os-btn" class="mobile-menu-item">
+                <span class="mobile-menu-icon">+</span>
+                <span>Nova OS</span>
+            </button>
+        </div>
 
         <div class="stats-grid">
             <!-- Status de Atendimentos -->
