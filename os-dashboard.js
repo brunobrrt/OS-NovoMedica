@@ -130,7 +130,7 @@ class OSDashboard {
         
         if (qrBtn) qrBtn.addEventListener('click', () => { this.openQRModal(); this.closeMobileActionsMenu(); });
         if (devicesBtn) devicesBtn.addEventListener('click', () => window.location.href = 'aparelhos.html');
-        if (clientsBtn) clientsBtn.addEventListener('click', () => { this.openClientsListModal(); this.closeMobileActionsMenu(); });
+        if (clientsBtn) clientsBtn.addEventListener('click', () => window.location.href = 'clientes-gerenciar.html');
         if (atendimentoBtn) atendimentoBtn.addEventListener('click', () => { this.openAtendimentoModal(); this.closeMobileActionsMenu(); });
         if (osBtn) osBtn.addEventListener('click', () => { this.openOSModal(); this.closeMobileActionsMenu(); });
         
@@ -143,7 +143,7 @@ class OSDashboard {
         
         if (mobileQrBtn) mobileQrBtn.addEventListener('click', () => { this.openQRModal(); this.closeMobileActionsMenu(); });
         if (mobileDevicesBtn) mobileDevicesBtn.addEventListener('click', () => window.location.href = 'aparelhos.html');
-        if (mobileClientsBtn) mobileClientsBtn.addEventListener('click', () => { this.openClientsListModal(); this.closeMobileActionsMenu(); });
+        if (mobileClientsBtn) mobileClientsBtn.addEventListener('click', () => window.location.href = 'clientes-gerenciar.html');
         if (mobileAtendimentoBtn) mobileAtendimentoBtn.addEventListener('click', () => { this.openAtendimentoModal(); this.closeMobileActionsMenu(); });
         if (mobileOsBtn) mobileOsBtn.addEventListener('click', () => { this.openOSModal(); this.closeMobileActionsMenu(); });
         
