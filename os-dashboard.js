@@ -2528,13 +2528,22 @@ class OSDashboard {
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    const img = document.createElement('div');
-                    img.style.cssText = 'position: relative; border: 2px solid #ddd; border-radius: 8px; overflow: hidden;';
-                    img.innerHTML = `
-                        <img src="${e.target.result}" style="width: 100%; height: 120px; object-fit: cover;" data-image-data="${e.target.result}">
-                        <button onclick="this.parentElement.remove()" style="position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-size: 16px; line-height: 1;">×</button>
-                    `;
-                    previewDiv.appendChild(img);
+                    const imgContainer = document.createElement('div');
+                    imgContainer.style.cssText = 'position: relative; border: 2px solid #ddd; border-radius: 8px; overflow: hidden;';
+                    
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.setAttribute('data-image-data', e.target.result);
+                    img.style.cssText = 'width: 100%; height: 120px; object-fit: cover;';
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.textContent = '×';
+                    removeBtn.style.cssText = 'position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-size: 16px; line-height: 1;';
+                    removeBtn.onclick = () => imgContainer.remove();
+                    
+                    imgContainer.appendChild(img);
+                    imgContainer.appendChild(removeBtn);
+                    previewDiv.appendChild(imgContainer);
                 };
                 reader.readAsDataURL(file);
             }
@@ -2547,13 +2556,22 @@ class OSDashboard {
         
         if (fotos && fotos.length > 0) {
             fotos.forEach(fotoData => {
-                const img = document.createElement('div');
-                img.style.cssText = 'position: relative; border: 2px solid #ddd; border-radius: 8px; overflow: hidden;';
-                img.innerHTML = `
-                    <img src="${fotoData}" data-image-data="${fotoData}" style="width: 100%; height: 120px; object-fit: cover;">
-                    <button onclick="this.parentElement.remove()" style="position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-size: 16px; line-height: 1;">×</button>
-                `;
-                previewDiv.appendChild(img);
+                const imgContainer = document.createElement('div');
+                imgContainer.style.cssText = 'position: relative; border: 2px solid #ddd; border-radius: 8px; overflow: hidden;';
+                
+                const img = document.createElement('img');
+                img.src = fotoData;
+                img.setAttribute('data-image-data', fotoData);
+                img.style.cssText = 'width: 100%; height: 120px; object-fit: cover;';
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.textContent = '×';
+                removeBtn.style.cssText = 'position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-size: 16px; line-height: 1;';
+                removeBtn.onclick = () => imgContainer.remove();
+                
+                imgContainer.appendChild(img);
+                imgContainer.appendChild(removeBtn);
+                previewDiv.appendChild(imgContainer);
             });
         }
     }
