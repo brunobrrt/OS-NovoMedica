@@ -5,10 +5,21 @@
     margin: 0 auto;
 }
 
+header {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 100;
+    padding: 15px 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin: -20px -20px 20px -20px;
+}
+
 .header-actions {
     display: flex;
     gap: 10px;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .stats-grid {
@@ -403,12 +414,37 @@ table tbody tr:hover {
 
 /* Responsivo */
 @media (max-width: 768px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .main-content {
+        padding: 10px;
+    }
+    
+    header {
+        margin: -10px -10px 15px -10px;
+        padding: 10px;
+    }
+    
+    header h1 {
+        font-size: 18px;
+        margin: 10px 0;
     }
     
     .header-actions {
-        flex-wrap: wrap;
+        width: 100%;
+        margin-top: 10px;
+    }
+    
+    .header-actions .btn {
+        flex: 1;
+        justify-content: center;
+        padding: 10px 8px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 15px;
     }
     
     .panel-header {
@@ -420,6 +456,7 @@ table tbody tr:hover {
     .panel-controls {
         width: 100%;
         justify-content: space-between;
+        flex-wrap: wrap;
     }
     
     table {
@@ -442,18 +479,28 @@ table tbody tr:hover {
 }
 
 @media (max-width: 480px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
+    header h1 {
+        font-size: 16px;
     }
     
     .header-actions {
         flex-direction: column;
-        width: 100%;
+        gap: 8px;
     }
     
-    .header-actions button {
+    .header-actions .btn {
         width: 100%;
-        justify-content: center;
+        padding: 12px;
+        font-size: 14px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    #menu-toggle {
+        font-size: 24px;
+        padding: 8px;
     }
 }
 
