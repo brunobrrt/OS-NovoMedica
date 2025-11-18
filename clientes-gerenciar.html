@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Clientes - Sistema OS</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="os-dashboard.css">
+</head>
+<body>
+    <div id="sidebar" class="sidebar">
+        <h2>Menu</h2>
+        <nav>
+            <a href="os-dashboard.html">Dashboard OS</a>
+            <a href="aparelhos.html">Gerenciar Aparelhos</a>
+            <a href="clientes-gerenciar.html" class="active">Gerenciar Clientes</a>
+            <a href="dashboard.html">Painel Principal</a>
+            <a href="registrar.html">Registrar Venda</a>
+            <a href="entrada.html">Entrada de Reparo</a>
+            <a href="atendimentos.html">Atendimentos</a>
+            <a href="estoque.html">Estoque</a>
+            <a href="financeiro.html">Financeiro</a>
+        </nav>
+        <div class="user-info">
+            <span id="userEmail"></span>
+            <button id="logoutButton">Sair</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <button id="menu-toggle">☰</button>
+            <h1>Gerenciar Clientes</h1>
+            <div class="header-actions">
+                <button id="new-client-btn" class="btn btn-success">+ Novo Cliente</button>
+                <button id="import-clients-btn" class="btn btn-info">📥 Importar</button>
+            </div>
+            
+            <!-- Botão de Menu Mobile -->
+            <button id="mobile-actions-btn" class="mobile-actions-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="5" r="2"/>
+                    <circle cx="12" cy="12" r="2"/>
+                    <circle cx="12" cy="19" r="2"/>
+                </svg>
+            </button>
+        </header>
+        
+        <!-- Menu Mobile Popup -->
+        <div id="mobile-actions-menu" class="mobile-actions-menu">
+            <button id="mobile-new-client-btn" class="mobile-menu-item">
+                <span class="mobile-menu-icon">+</span>
+                <span>Novo Cliente</span>
+            </button>
+            <button id="mobile-import-clients-btn" class="mobile-menu-item">
+                <span class="mobile-menu-icon">📥</span>
+                <span>Importar</span>
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total de Clientes</h3>
+                <div class="stat-number" id="stat-total-clients">0</div>
+                <small>Cadastrados no sistema</small>
+            </div>
+            <div class="stat-card">
+                <h3>Com Aparelhos</h3>
+                <div class="stat-number" id="stat-clients-with-devices">0</div>
+                <small>Possuem aparelhos vinculados</small>
+            </div>
+            <div class="stat-card">
+                <h3>Sem Aparelhos</h3>
+                <div class="stat-number" id="stat-clients-without-devices">0</div>
+                <small>Não possuem aparelhos</small>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Lista de Clientes</h2>
+                <div class="panel-controls">
+                    <input type="text" id="search-clients" placeholder="Buscar por nome, telefone, CPF, QR..." class="search-input">
+                    <button id="refresh-clients" class="btn btn-secondary">Atualizar</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="clients-table">
+                    <thead>
+                        <tr>
+                            <th>QR Code</th>
+                            <th>Nome</th>
+                            <th>Telefone</th>
+                            <th>CPF/CNPJ</th>
+                            <th>Email</th>
+                            <th>Aparelhos</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clients-tbody">
+                    </tbody>
+                </table>
+                <div id="clients-loading" class="loading">Carregando...</div>
+                <div id="clients-empty" class="empty-state">
+                    Nenhum cliente cadastrado
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Cliente -->
+    <div id="client-modal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2 id="client-modal-title">Novo Cliente</h2>
+                <span class="close" data-modal="client-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="client-form">
+                    <input type="hidden" id="client-id">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <!-- Coluna 1: Dados do Cliente -->
+                        <div>
+                            <h3 style="margin-top: 0;">Dados do Cliente</h3>
+                            <div class="form-group">
+                                <label for="client-name">Nome Completo: *</label>
+                                <input type="text" id="client-name" required placeholder="Nome completo do cliente">
+                            </div>
+                            <div class="form-group">
+                                <label for="client-phone">Telefone: *</label>
+                                <input type="tel" id="client-phone" required placeholder="(00) 00000-0000">
+                            </div>
+                            <div class="form-group">
+                                <label for="client-cpf-cnpj">CPF ou CNPJ:</label>
+                                <input type="text" id="client-cpf-cnpj" placeholder="000.000.000-00 ou 00.000.000/0000-00">
+                            </div>
+                            <div class="form-group">
+                                <label for="client-email">Email:</label>
+                                <input type="email" id="client-email" placeholder="email@exemplo.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="client-address">Endereço:</label>
+                                <textarea id="client-address" placeholder="Rua, número, bairro, cidade..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Coluna 2: Aparelhos Vinculados -->
+                        <div>
+                            <h3 style="margin-top: 0;">Aparelhos Vinculados</h3>
+                            <div id="client-devices-section">
+                                <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <button type="button" id="add-device-to-client-btn" class="btn btn-success btn-sm">+ Adicionar Aparelho</button>
+                                    <button type="button" id="link-existing-device-btn" class="btn btn-info btn-sm">🔗 Vincular Existente</button>
+                                </div>
+                                <div id="client-devices-list" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 10px;">
+                                    <p style="text-align: center; color: #666;">Nenhum aparelho vinculado</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions" style="margin-top: 20px; grid-column: 1 / -1;">
+                        <button type="button" class="btn btn-secondary" data-close="client-modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Cliente</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Vincular Aparelho Existente -->
+    <div id="link-device-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Vincular Aparelho Existente</h2>
+                <span class="close" data-modal="link-device-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Selecione um aparelho disponível para vincular ao cliente:</p>
+                <div id="available-devices-list" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 10px;">
+                    <p style="text-align: center; color: #666;">Carregando...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Adicionar Novo Aparelho -->
+    <div id="new-device-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Adicionar Novo Aparelho</h2>
+                <span class="close" data-modal="new-device-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="new-device-form">
+                    <div class="form-group">
+                        <label for="new-device-brand">Marca: *</label>
+                        <input type="text" id="new-device-brand" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-device-model">Modelo: *</label>
+                        <input type="text" id="new-device-model" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-device-imei">Número de Série/IMEI:</label>
+                        <input type="text" id="new-device-imei">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-device-notes">Observações:</label>
+                        <textarea id="new-device-notes"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" data-close="new-device-modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Adicionar Aparelho</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Scripts -->
+    <script src="auth.js"></script>
+    <script src="clientes-gerenciar.js"></script>
+</body>
+</html>
