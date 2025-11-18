@@ -2335,11 +2335,14 @@ class OSDashboard {
     }
 
     salvarFotosEntrada() {
+        console.log('salvarFotosEntrada called');
         const atendimentoId = document.getElementById('fotos-entrada-item-id').value;
+        console.log('atendimentoId:', atendimentoId);
         
         // Buscar em todos os arrays possíveis
         const atendimentos = JSON.parse(localStorage.getItem('mockAtendimentos') || '[]');
         const ordensServico = JSON.parse(localStorage.getItem('mockOrdens') || '[]');
+        console.log('atendimentos:', atendimentos.length, 'ordensServico:', ordensServico.length);
         
         let found = false;
         let targetArray = null;
@@ -2352,6 +2355,7 @@ class OSDashboard {
             found = true;
             targetArray = atendimentos;
             targetKey = 'mockAtendimentos';
+            console.log('Found in atendimentos at index:', index);
         }
         
         // Se não encontrou, buscar em OS
@@ -2361,10 +2365,12 @@ class OSDashboard {
                 found = true;
                 targetArray = ordensServico;
                 targetKey = 'mockOrdens';
+                console.log('Found in ordensServico at index:', index);
             }
         }
         
         if (!found) {
+            console.error('Atendimento não encontrado:', atendimentoId);
             this.showNotification('Atendimento não encontrado', 'error');
             return;
         }
@@ -2372,8 +2378,10 @@ class OSDashboard {
         // Coletar todas as imagens do preview
         const previewDiv = document.getElementById('fotos-entrada-preview');
         const imgElements = previewDiv.querySelectorAll('img');
+        console.log('imgElements found:', imgElements.length);
         
         if (imgElements.length === 0) {
+            console.warn('No images found in preview');
             this.showNotification('Nenhuma foto foi adicionada', 'warning');
             return;
         }
@@ -2382,6 +2390,7 @@ class OSDashboard {
             // Tentar pegar do data-attribute primeiro, senão usar src
             return img.dataset.imageData || img.src;
         });
+        console.log('Fotos collected:', fotos.length);
 
         targetArray[index].fotosEntrada = fotos;
         targetArray[index].fotosEntradaObs = document.getElementById('fotos-entrada-obs').value;
@@ -2389,6 +2398,7 @@ class OSDashboard {
         targetArray[index].updatedAt = new Date().toISOString();
 
         localStorage.setItem(targetKey, JSON.stringify(targetArray));
+        console.log('Saved to localStorage:', targetKey);
         
         this.showNotification(`${fotos.length} foto(s) e observações de entrada salvas com sucesso`, 'success');
         this.closeModal('fotos-entrada-modal');
@@ -2436,11 +2446,14 @@ class OSDashboard {
     }
 
     salvarFotosSaida() {
+        console.log('salvarFotosSaida called');
         const atendimentoId = document.getElementById('fotos-saida-item-id').value;
+        console.log('atendimentoId:', atendimentoId);
         
         // Buscar em todos os arrays possíveis
         const atendimentos = JSON.parse(localStorage.getItem('mockAtendimentos') || '[]');
         const ordensServico = JSON.parse(localStorage.getItem('mockOrdens') || '[]');
+        console.log('atendimentos:', atendimentos.length, 'ordensServico:', ordensServico.length);
         
         let found = false;
         let targetArray = null;
@@ -2453,6 +2466,7 @@ class OSDashboard {
             found = true;
             targetArray = atendimentos;
             targetKey = 'mockAtendimentos';
+            console.log('Found in atendimentos at index:', index);
         }
         
         // Se não encontrou, buscar em OS
@@ -2462,10 +2476,12 @@ class OSDashboard {
                 found = true;
                 targetArray = ordensServico;
                 targetKey = 'mockOrdens';
+                console.log('Found in ordensServico at index:', index);
             }
         }
         
         if (!found) {
+            console.error('Atendimento não encontrado:', atendimentoId);
             this.showNotification('Atendimento não encontrado', 'error');
             return;
         }
@@ -2473,8 +2489,10 @@ class OSDashboard {
         // Coletar todas as imagens do preview
         const previewDiv = document.getElementById('fotos-saida-preview');
         const imgElements = previewDiv.querySelectorAll('img');
+        console.log('imgElements found:', imgElements.length);
         
         if (imgElements.length === 0) {
+            console.warn('No images found in preview');
             this.showNotification('Nenhuma foto foi adicionada', 'warning');
             return;
         }
@@ -2483,6 +2501,7 @@ class OSDashboard {
             // Tentar pegar do data-attribute primeiro, senão usar src
             return img.dataset.imageData || img.src;
         });
+        console.log('Fotos collected:', fotos.length);
 
         targetArray[index].fotosSaida = fotos;
         targetArray[index].fotosSaidaObs = document.getElementById('fotos-saida-obs').value;
@@ -2490,6 +2509,7 @@ class OSDashboard {
         targetArray[index].updatedAt = new Date().toISOString();
 
         localStorage.setItem(targetKey, JSON.stringify(targetArray));
+        console.log('Saved to localStorage:', targetKey);
         
         this.showNotification(`${fotos.length} foto(s) e observações de saída salvas com sucesso`, 'success');
         this.closeModal('fotos-saida-modal');
