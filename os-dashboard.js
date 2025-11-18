@@ -222,11 +222,28 @@ class OSDashboard {
         document.getElementById('save-signature').addEventListener('click', () => this.saveSignature());
         
         // Confirmação de pagamento
-        document.getElementById('confirm-payment-btn').addEventListener('click', () => this.confirmPayment());
+        const confirmPaymentBtn = document.getElementById('confirm-payment-btn');
+        if (confirmPaymentBtn) {
+            confirmPaymentBtn.addEventListener('click', () => this.confirmPayment());
+        }
         
         // Fotos de entrada e saída
-        document.getElementById('salvar-fotos-entrada-btn').addEventListener('click', () => this.salvarFotosEntrada());
-        document.getElementById('salvar-fotos-saida-btn').addEventListener('click', () => this.salvarFotosSaida());
+        const salvarFotosEntradaBtn = document.getElementById('salvar-fotos-entrada-btn');
+        const salvarFotosSaidaBtn = document.getElementById('salvar-fotos-saida-btn');
+        
+        if (salvarFotosEntradaBtn) {
+            salvarFotosEntradaBtn.addEventListener('click', () => {
+                console.log('Botão salvar fotos entrada clicado');
+                this.salvarFotosEntrada();
+            });
+        }
+        
+        if (salvarFotosSaidaBtn) {
+            salvarFotosSaidaBtn.addEventListener('click', () => {
+                console.log('Botão salvar fotos saída clicado');
+                this.salvarFotosSaida();
+            });
+        }
     }
 
     setupModalListeners() {
