@@ -1088,7 +1088,22 @@ class OSDashboard {
     }
 
     closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
+        }
+        
+        // Fechar overlay se não houver outros modais abertos
+        const openModals = Array.from(document.querySelectorAll('.modal')).filter(m => 
+            m.style.display === 'block'
+        );
+        
+        if (openModals.length === 0) {
+            const overlay = document.getElementById('overlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+        }
     }
 
     // QR Code processing
