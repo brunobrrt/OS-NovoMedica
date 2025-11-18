@@ -2560,26 +2560,55 @@ class OSDashboard {
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    const imgContainer = document.createElement('div');
-                    imgContainer.style.cssText = 'position: relative; border: 2px solid #ddd; border-radius: 8px; overflow: hidden;';
-                    
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.setAttribute('data-image-data', e.target.result);
-                    img.style.cssText = 'width: 100%; height: 120px; object-fit: cover;';
-                    
-                    const removeBtn = document.createElement('button');
-                    removeBtn.textContent = '×';
-                    removeBtn.style.cssText = 'position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-size: 16px; line-height: 1;';
-                    removeBtn.onclick = () => imgContainer.remove();
-                    
-                    imgContainer.appendChild(img);
-                    imgContainer.appendChild(removeBtn);
-                    previewDiv.appendChild(imgContainer);
+                    // Comprimir imagem antes de adicionar ao preview
+                    this.compressImage(e.target.result, (compressedImage) => {
+                        const imgContainer = document.createElement('div');
+                        imgContainer.style.cssText = 'position: relative; border: 2px solid #ddd; border-radius: 8px; overflow: hidden;';
+                        
+                        const img = document.createElement('img');
+                        img.src = compressedImage;
+                        img.setAttribute('data-image-data', compressedImage);
+                        img.style.cssText = 'width: 100%; height: 120px; object-fit: cover;';
+                        
+                        const removeBtn = document.createElement('button');
+                        removeBtn.textContent = '×';
+                        removeBtn.style.cssText = 'position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-size: 16px; line-height: 1;';
+                        removeBtn.onclick = () => imgContainer.remove();
+                        
+                        imgContainer.appendChild(img);
+                        imgContainer.appendChild(removeBtn);
+                        previewDiv.appendChild(imgContainer);
+                    });
                 };
                 reader.readAsDataURL(file);
             }
         });
+    }
+
+    compressImage(base64Image, callback, maxWidth = 800, quality = 0.7) {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            
+            // Redimensionar se necessário
+            if (width > maxWidth) {
+                height = (height * maxWidth) / width;
+                width = maxWidth;
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Comprimir em JPEG com qualidade reduzida
+            const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+            callback(compressedBase64);
+        };
+        img.src = base64Image;
     }
 
     loadFotosPreview(tipo, fotos) {
@@ -2671,12 +2700,26 @@ class OSDashboard {
         targetArray[index].fotosEntradaCount = fotos.length;
         targetArray[index].updatedAt = new Date().toISOString();
 
-        localStorage.setItem(targetKey, JSON.stringify(targetArray));
-        console.log('Saved to localStorage:', targetKey);
-        
-        this.showNotification(`${fotos.length} foto(s) e observações de entrada salvas com sucesso`, 'success');
-        this.closeModal('fotos-entrada-modal');
-        this.loadEntradaAparelhos();
+        try {
+            localStorage.setItem(targetKey, JSON.stringify(targetArray));
+            console.log('Saved to localStorage:', targetKey);
+            
+            this.showNotification(`${fotos.length} foto(s) e observações de entrada salvas com sucesso`, 'success');
+            this.closeModal('fotos-entrada-modal');
+            this.loadEntradaAparelhos();
+        } catch (error) {
+            console.error('Erro ao salvar no localStorage:', error);
+            
+            if (error.name === 'QuotaExceededError') {
+                this.showNotification('Espaço de armazenamento insuficiente. Reduza o número de fotos ou use fotos menores.', 'error');
+                
+                // Reverter as mudanças
+                targetArray[index].fotosEntrada = targetArray[index].fotosEntrada || [];
+                targetArray[index].fotosEntradaCount = (targetArray[index].fotosEntrada || []).length;
+            } else {
+                this.showNotification('Erro ao salvar fotos: ' + error.message, 'error');
+            }
+        }
     }
 
     // Funções para gerenciar fotos de saída
@@ -2782,12 +2825,26 @@ class OSDashboard {
         targetArray[index].fotosSaidaCount = fotos.length;
         targetArray[index].updatedAt = new Date().toISOString();
 
-        localStorage.setItem(targetKey, JSON.stringify(targetArray));
-        console.log('Saved to localStorage:', targetKey);
-        
-        this.showNotification(`${fotos.length} foto(s) e observações de saída salvas com sucesso`, 'success');
-        this.closeModal('fotos-saida-modal');
-        this.loadSaidaAparelhos();
+        try {
+            localStorage.setItem(targetKey, JSON.stringify(targetArray));
+            console.log('Saved to localStorage:', targetKey);
+            
+            this.showNotification(`${fotos.length} foto(s) e observações de saída salvas com sucesso`, 'success');
+            this.closeModal('fotos-saida-modal');
+            this.loadSaidaAparelhos();
+        } catch (error) {
+            console.error('Erro ao salvar no localStorage:', error);
+            
+            if (error.name === 'QuotaExceededError') {
+                this.showNotification('Espaço de armazenamento insuficiente. Reduza o número de fotos ou use fotos menores.', 'error');
+                
+                // Reverter as mudanças
+                targetArray[index].fotosSaida = targetArray[index].fotosSaida || [];
+                targetArray[index].fotosSaidaCount = (targetArray[index].fotosSaida || []).length;
+            } else {
+                this.showNotification('Erro ao salvar fotos: ' + error.message, 'error');
+            }
+        }
     }
 
     finalizarEntrega(atendimentoId) {
