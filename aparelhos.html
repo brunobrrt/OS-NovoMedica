@@ -36,7 +36,28 @@
                 <button id="new-device-btn" class="btn btn-success">+ Novo Aparelho</button>
                 <button id="scan-device-qr-btn" class="btn btn-info">📷 Escanear QR</button>
             </div>
+            
+            <!-- Botão de Menu Mobile -->
+            <button id="mobile-actions-btn" class="mobile-actions-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="5" r="2"/>
+                    <circle cx="12" cy="12" r="2"/>
+                    <circle cx="12" cy="19" r="2"/>
+                </svg>
+            </button>
         </header>
+        
+        <!-- Menu Mobile Popup -->
+        <div id="mobile-actions-menu" class="mobile-actions-menu">
+            <button id="mobile-new-device-btn" class="mobile-menu-item">
+                <span class="mobile-menu-icon">+</span>
+                <span>Novo Aparelho</span>
+            </button>
+            <button id="mobile-scan-device-qr-btn" class="mobile-menu-item">
+                <span class="mobile-menu-icon">📷</span>
+                <span>Escanear QR</span>
+            </button>
+        </div>
 
         <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 30px;">
             <div class="stat-card">

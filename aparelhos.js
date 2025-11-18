@@ -35,8 +35,19 @@ class DeviceManager {
 
     setupEventListeners() {
         // Botões principais
-        document.getElementById('new-device-btn').addEventListener('click', () => this.openDeviceModal());
-        document.getElementById('scan-device-qr-btn').addEventListener('click', () => this.openQRScanner());
+        const newDeviceBtn = document.getElementById('new-device-btn');
+        const scanQrBtn = document.getElementById('scan-device-qr-btn');
+        
+        if (newDeviceBtn) newDeviceBtn.addEventListener('click', () => { this.openDeviceModal(); this.closeMobileActionsMenu(); });
+        if (scanQrBtn) scanQrBtn.addEventListener('click', () => { this.openQRScanner(); this.closeMobileActionsMenu(); });
+        
+        // Botões mobile
+        const mobileNewDeviceBtn = document.getElementById('mobile-new-device-btn');
+        const mobileScanQrBtn = document.getElementById('mobile-scan-device-qr-btn');
+        
+        if (mobileNewDeviceBtn) mobileNewDeviceBtn.addEventListener('click', () => { this.openDeviceModal(); this.closeMobileActionsMenu(); });
+        if (mobileScanQrBtn) mobileScanQrBtn.addEventListener('click', () => { this.openQRScanner(); this.closeMobileActionsMenu(); });
+        
         document.getElementById('refresh-devices').addEventListener('click', () => this.loadDevices());
 
         // Busca e filtros
@@ -50,26 +61,67 @@ class DeviceManager {
         // Modais
         this.setupModalListeners();
 
-        // Menu toggle
-        const menuToggle = document.getElementById('menu-toggle');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        if (menuToggle && sidebar && overlay) {
-            menuToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('open');
-                overlay.classList.toggle('active');
-            });
-            overlay.addEventListener('click', () => {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('active');
-            });
-        }
+        // Menu toggle e mobile menu
+        this.setupMobileMenu();
         
         // Verificar se deve abrir modal para adicionar aparelho a um cliente específico
         const addDeviceForClient = localStorage.getItem('addDeviceForClient');
         if (addDeviceForClient) {
             localStorage.removeItem('addDeviceForClient');
             this.openDeviceModalForClient(addDeviceForClient);
+        }
+    }
+
+    setupMobileMenu() {
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        
+        if (menuToggle && sidebar && overlay) {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            });
+            
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+                this.closeMobileActionsMenu();
+            });
+        }
+        
+        // Setup mobile actions menu
+        const mobileActionsBtn = document.getElementById('mobile-actions-btn');
+        const mobileActionsMenu = document.getElementById('mobile-actions-menu');
+        
+        if (mobileActionsBtn && mobileActionsMenu) {
+            mobileActionsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                mobileActionsMenu.classList.toggle('show');
+                overlay.classList.toggle('active');
+            });
+        }
+        
+        // Close mobile actions menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (mobileActionsMenu && !mobileActionsMenu.contains(e.target) && e.target.id !== 'mobile-actions-btn') {
+                this.closeMobileActionsMenu();
+            }
+        });
+    }
+
+    closeMobileActionsMenu() {
+        const mobileActionsMenu = document.getElementById('mobile-actions-menu');
+        const overlay = document.getElementById('overlay');
+        
+        if (mobileActionsMenu) {
+            mobileActionsMenu.classList.remove('show');
+        }
+        
+        // Only remove overlay if sidebar is not open
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar && !sidebar.classList.contains('open')) {
+            overlay.classList.remove('active');
         }
     }
 
