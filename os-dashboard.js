@@ -149,6 +149,33 @@ class OSDashboard {
         
         document.getElementById('add-client-btn').addEventListener('click', () => this.openNewClientModal());
         document.getElementById('scan-qr-client-btn').addEventListener('click', () => this.openQRModalForAtendimento());
+        
+        // Toggle manual device input
+        const toggleManualDevice = document.getElementById('toggle-manual-device');
+        const deviceSelect = document.getElementById('atendimento-device');
+        const deviceManual = document.getElementById('atendimento-device-manual');
+        
+        if (toggleManualDevice && deviceSelect && deviceManual) {
+            toggleManualDevice.addEventListener('click', () => {
+                if (deviceManual.style.display === 'none') {
+                    deviceManual.style.display = 'block';
+                    deviceSelect.style.display = 'none';
+                    toggleManualDevice.textContent = '📋';
+                    toggleManualDevice.title = 'Selecionar da lista';
+                } else {
+                    deviceManual.style.display = 'none';
+                    deviceSelect.style.display = 'block';
+                    toggleManualDevice.textContent = '✏️';
+                    toggleManualDevice.title = 'Digitar manualmente';
+                }
+            });
+        }
+        
+        // Add new device from atendimento modal
+        const addNewDeviceBtn = document.getElementById('add-new-device-atendimento');
+        if (addNewDeviceBtn) {
+            addNewDeviceBtn.addEventListener('click', () => this.openQuickDeviceModal());
+        }
 
         // Busca de cliente
         document.getElementById('atendimento-client-search').addEventListener('input', (e) => this.searchClients(e.target.value));
@@ -878,17 +905,119 @@ class OSDashboard {
             const selects = ['atendimento-client', 'os-client'];
             selects.forEach(selectId => {
                 const select = document.getElementById(selectId);
-                select.innerHTML = '<option value="">Selecione um cliente</option>';
-                clients.forEach(client => {
-                    const option = document.createElement('option');
-                    option.value = client.id;
-                    option.textContent = client.name;
-                    select.appendChild(option);
-                });
+                if (select) {
+                    select.innerHTML = '<option value="">Selecione um cliente</option>';
+                    clients.forEach(client => {
+                        const option = document.createElement('option');
+                        option.value = client.id;
+                        option.textContent = client.name;
+                        select.appendChild(option);
+                    });
+                    
+                    // Adicionar listener para carregar aparelhos quando cliente for selecionado
+                    if (selectId === 'atendimento-client') {
+                        select.addEventListener('change', (e) => this.loadClientDevicesForAtendimento(e.target.value));
+                    }
+                }
             });
         } catch (error) {
             console.error('Erro ao carregar clientes:', error);
         }
+    }
+    
+    loadClientDevicesForAtendimento(clientId) {
+        const deviceSelect = document.getElementById('atendimento-device');
+        if (!deviceSelect || !clientId) return;
+        
+        const devices = JSON.parse(localStorage.getItem('mockDevices') || '[]');
+        const clientDevices = devices.filter(d => d.ownerId === clientId);
+        
+        deviceSelect.innerHTML = '<option value="">Selecione um aparelho ou digite manualmente</option>';
+        clientDevices.forEach(device => {
+            const option = document.createElement('option');
+            option.value = device.id;
+            option.textContent = `${device.brand} ${device.model}${device.imei ? ' - ' + device.imei : ''}`;
+            deviceSelect.appendChild(option);
+        });
+    }
+    
+    openQuickDeviceModal() {
+        const clientId = document.getElementById('atendimento-client').value;
+        if (!clientId) {
+            this.showNotification('Selecione um cliente primeiro', 'warning');
+            return;
+        }
+        
+        // Criar e mostrar modal simples para cadastro rápido
+        const quickModal = document.createElement('div');
+        quickModal.id = 'quick-device-modal';
+        quickModal.className = 'modal';
+        quickModal.style.display = 'block';
+        quickModal.innerHTML = `
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h2>Cadastrar Novo Aparelho</h2>
+                    <span class="close" onclick="document.getElementById('quick-device-modal').remove(); document.getElementById('overlay').classList.remove('active');">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Marca: *</label>
+                        <input type="text" id="quick-device-brand" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Modelo: *</label>
+                        <input type="text" id="quick-device-model" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Número de Série/IMEI:</label>
+                        <input type="text" id="quick-device-imei">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('quick-device-modal').remove(); document.getElementById('overlay').classList.remove('active');">Cancelar</button>
+                        <button type="button" class="btn btn-primary" onclick="dashboard.saveQuickDevice('${clientId}')">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(quickModal);
+        document.getElementById('overlay').classList.add('active');
+    }
+    
+    saveQuickDevice(clientId) {
+        const brand = document.getElementById('quick-device-brand').value;
+        const model = document.getElementById('quick-device-model').value;
+        const imei = document.getElementById('quick-device-imei').value;
+        
+        if (!brand || !model) {
+            this.showNotification('Preencha marca e modelo', 'warning');
+            return;
+        }
+        
+        const devices = JSON.parse(localStorage.getItem('mockDevices') || '[]');
+        const newDevice = {
+            id: 'dev-' + Date.now(),
+            brand: brand,
+            model: model,
+            imei: imei,
+            ownerId: clientId,
+            qrCode: 'QR-DEV-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+            createdAt: new Date().toISOString()
+        };
+        
+        devices.push(newDevice);
+        localStorage.setItem('mockDevices', JSON.stringify(devices));
+        
+        // Recarregar lista de aparelhos
+        this.loadClientDevicesForAtendimento(clientId);
+        
+        // Selecionar o aparelho recém-criado
+        document.getElementById('atendimento-device').value = newDevice.id;
+        
+        // Fechar modal
+        document.getElementById('quick-device-modal').remove();
+        document.getElementById('overlay').classList.remove('active');
+        
+        this.showNotification('Aparelho cadastrado com sucesso!', 'success');
     }
 
     // Modal management
@@ -1090,8 +1219,29 @@ class OSDashboard {
         const atendimentoDate = document.getElementById('atendimento-date').value;
         const atendimentoTime = document.getElementById('atendimento-time').value;
         
+        // Obter aparelho selecionado ou manual
+        const deviceSelect = document.getElementById('atendimento-device');
+        const deviceManual = document.getElementById('atendimento-device-manual');
+        let deviceId = null;
+        let deviceInfo = '';
+        
+        if (deviceManual.style.display !== 'none' && deviceManual.value) {
+            // Modo manual
+            deviceInfo = deviceManual.value;
+        } else if (deviceSelect.value) {
+            // Aparelho selecionado
+            deviceId = deviceSelect.value;
+            const devices = JSON.parse(localStorage.getItem('mockDevices') || '[]');
+            const device = devices.find(d => d.id === deviceId);
+            if (device) {
+                deviceInfo = `${device.brand} ${device.model}`;
+            }
+        }
+        
         const data = {
             clientId: document.getElementById('atendimento-client').value,
+            deviceId: deviceId,
+            deviceInfo: deviceInfo,
             summary: document.getElementById('atendimento-summary').value,
             priority: document.getElementById('atendimento-priority').value,
             status: document.getElementById('atendimento-status').value,

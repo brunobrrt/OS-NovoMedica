@@ -523,6 +523,17 @@
                         <textarea id="atendimento-summary" required placeholder="Descreva o problema ou serviço necessário..."></textarea>
                     </div>
                     <div class="form-group">
+                        <label for="atendimento-device">Aparelho:</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <select id="atendimento-device" style="flex: 1;">
+                                <option value="">Selecione um aparelho ou digite manualmente</option>
+                            </select>
+                            <button type="button" id="toggle-manual-device" class="btn btn-info btn-sm" title="Digitar manualmente">✏️</button>
+                            <button type="button" id="add-new-device-atendimento" class="btn btn-success btn-sm" title="Cadastrar novo aparelho">+ Novo</button>
+                        </div>
+                        <input type="text" id="atendimento-device-manual" placeholder="Digite marca e modelo do aparelho" style="margin-top: 10px; display: none;">
+                    </div>
+                    <div class="form-group">
                         <label for="atendimento-date">Data do Atendimento:</label>
                         <input type="text" id="atendimento-date" required placeholder="dd/mm/aaaa" pattern="\d{2}/\d{2}/\d{4}" title="Formato: dd/mm/aaaa">
                     </div>
