@@ -2064,13 +2064,311 @@ class OSDashboard {
     }
 
     signOS(id) {
+        // Carregar OS com fotos
+        const allOrdens = JSON.parse(localStorage.getItem('mockOrdens') || '[]');
+        const ordem = allOrdens.find(o => o.id === id);
+        
+        if (!ordem) {
+            this.showNotification('OS não encontrada', 'error');
+            return;
+        }
+        
+        // Carregar atendimento relacionado para pegar fotos
+        const allAtendimentos = JSON.parse(localStorage.getItem('mockAtendimentos') || '[]');
+        const atendimento = allAtendimentos.find(a => a.id === ordem.atendimentoId);
+        
+        // Buscar informações do aparelho se não estiver na OS
+        let deviceInfo = ordem.deviceInfo || 'N/A';
+        if (deviceInfo === 'N/A' && ordem.deviceId) {
+            const devices = JSON.parse(localStorage.getItem('mockDevices') || '[]');
+            const device = devices.find(d => d.id === ordem.deviceId);
+            if (device) {
+                deviceInfo = `${device.brand || ''} ${device.model || ''}`.trim() || device.name || 'Aparelho';
+            }
+        }
+        if (deviceInfo === 'N/A' && atendimento) {
+            deviceInfo = atendimento.deviceInfo || atendimento.device || atendimento.summary || 'N/A';
+        }
+        
         document.getElementById('signature-info').innerHTML = `
-            <p><strong>OS ID:</strong> ${id}</p>
-            <p>Colete a assinatura do cliente no campo abaixo:</p>
+            <div style="padding: 15px; background: #e3f2fd; border-radius: 8px; margin-bottom: 15px;">
+                <h3 style="margin-top: 0; color: #1976d2;">📋 Ordem de Serviço #${id}</h3>
+                <p style="margin: 5px 0;"><strong>Cliente:</strong> ${ordem.clientName || ordem.client?.name || 'N/A'}</p>
+                <p style="margin: 5px 0;"><strong>Aparelho:</strong> ${deviceInfo}</p>
+                <p style="margin: 5px 0;"><strong>Problema:</strong> ${ordem.summary || 'N/A'}</p>
+                <p style="margin: 5px 0;"><strong>Serviço Realizado:</strong> ${ordem.service || 'Aguardando serviço'}</p>
+                ${ordem.valor ? `<p style="margin: 5px 0;"><strong>Valor:</strong> R$ ${parseFloat(ordem.valor).toFixed(2)}</p>` : ''}
+            </div>
         `;
+        
+        // Carregar fotos de entrada e saída
+        this.loadSignaturePhotos(atendimento);
+        
         this.clearSignature();
         this.currentOSId = id;
         this.openModal('signature-modal');
+    }
+    
+    loadSignaturePhotos(atendimento) {
+        const entradaGallery = document.getElementById('signature-fotos-entrada-gallery');
+        const saidaGallery = document.getElementById('signature-fotos-saida-gallery');
+        const entradaObs = document.getElementById('signature-fotos-entrada-obs');
+        const saidaObs = document.getElementById('signature-fotos-saida-obs');
+        const entradaEmpty = document.getElementById('signature-fotos-entrada-empty');
+        const saidaEmpty = document.getElementById('signature-fotos-saida-empty');
+        
+        // Limpar galerias
+        entradaGallery.innerHTML = '';
+        saidaGallery.innerHTML = '';
+        entradaObs.innerHTML = '';
+        saidaObs.innerHTML = '';
+        
+        // Fotos de entrada
+        if (atendimento && atendimento.fotosEntrada && atendimento.fotosEntrada.length > 0) {
+            entradaEmpty.style.display = 'none';
+            entradaGallery.style.display = 'grid';
+            
+            atendimento.fotosEntrada.forEach((foto, index) => {
+                const img = document.createElement('img');
+                img.src = foto;
+                img.alt = `Foto de Entrada ${index + 1}`;
+                img.style.cssText = 'width: 100%; height: auto; border-radius: 8px; cursor: pointer; border: 2px solid #0066cc;';
+                img.onclick = () => this.viewPhotoFullScreen(foto);
+                entradaGallery.appendChild(img);
+            });
+            
+            if (atendimento.observacoesEntrada) {
+                entradaObs.innerHTML = `<strong>Observações:</strong><br>${atendimento.observacoesEntrada}`;
+                entradaObs.style.display = 'block';
+            } else {
+                entradaObs.style.display = 'none';
+            }
+        } else {
+            entradaEmpty.style.display = 'block';
+            entradaGallery.style.display = 'none';
+            entradaObs.style.display = 'none';
+        }
+        
+        // Fotos de saída
+        if (atendimento && atendimento.fotosSaida && atendimento.fotosSaida.length > 0) {
+            saidaEmpty.style.display = 'none';
+            saidaGallery.style.display = 'grid';
+            
+            atendimento.fotosSaida.forEach((foto, index) => {
+                const img = document.createElement('img');
+                img.src = foto;
+                img.alt = `Foto de Saída ${index + 1}`;
+                img.style.cssText = 'width: 100%; height: auto; border-radius: 8px; cursor: pointer; border: 2px solid #28a745;';
+                img.onclick = () => this.viewPhotoFullScreen(foto);
+                saidaGallery.appendChild(img);
+            });
+            
+            if (atendimento.observacoesSaida) {
+                saidaObs.innerHTML = `<strong>Observações:</strong><br>${atendimento.observacoesSaida}`;
+                saidaObs.style.display = 'block';
+            } else {
+                saidaObs.style.display = 'none';
+            }
+        } else {
+            saidaEmpty.style.display = 'block';
+            saidaGallery.style.display = 'none';
+            saidaObs.style.display = 'none';
+        }
+        
+        // Iniciar com fotos ocultas (usuário precisa clicar para ver)
+        document.getElementById('signature-photos-content').style.display = 'none';
+    }
+    
+    toggleSignaturePhotos() {
+        const photosContent = document.getElementById('signature-photos-content');
+        const toggleBtn = document.getElementById('toggle-signature-photos');
+        
+        if (photosContent.style.display === 'none') {
+            photosContent.style.display = 'block';
+            toggleBtn.innerHTML = '🙈 Ocultar Fotos';
+        } else {
+            photosContent.style.display = 'none';
+            toggleBtn.innerHTML = '👁️ Ver Fotos';
+        }
+    }
+    
+    viewPhotoFullScreen(photoSrc) {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+        modal.style.zIndex = '10000';
+        modal.onclick = () => modal.remove();
+        
+        const img = document.createElement('img');
+        img.src = photoSrc;
+        img.style.cssText = 'max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);';
+        
+        modal.appendChild(img);
+        document.body.appendChild(modal);
+    }
+    
+    viewSignedOS(id) {
+        // Carregar OS com assinatura
+        const allOrdens = JSON.parse(localStorage.getItem('mockOrdens') || '[]');
+        const ordem = allOrdens.find(o => o.id === id);
+        
+        if (!ordem) {
+            this.showNotification('OS não encontrada', 'error');
+            return;
+        }
+        
+        if (!ordem.signature) {
+            this.showNotification('Esta OS não possui assinatura', 'warning');
+            return;
+        }
+        
+        // Carregar atendimento relacionado para pegar fotos
+        const allAtendimentos = JSON.parse(localStorage.getItem('mockAtendimentos') || '[]');
+        const atendimento = allAtendimentos.find(a => a.id === ordem.atendimentoId);
+        
+        // Criar modal personalizado para visualização
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+        modal.style.zIndex = '10000';
+        
+        const modalContent = document.createElement('div');
+        modalContent.className = 'modal-content';
+        modalContent.style.cssText = 'max-width: 1000px; max-height: 90vh; overflow-y: auto; background: white; border-radius: 12px; padding: 0;';
+        modalContent.onclick = (e) => e.stopPropagation();
+        
+        // Cabeçalho
+        const header = document.createElement('div');
+        header.style.cssText = 'padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px 12px 0 0;';
+        header.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0;">📋 OS #${id} - Assinada</h2>
+                <button onclick="this.closest('.modal').remove()" style="background: rgba(255,255,255,0.2); border: none; color: white; font-size: 24px; cursor: pointer; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">&times;</button>
+            </div>
+            <p style="margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Assinado em: ${new Date(ordem.signedAt).toLocaleString('pt-BR')}</p>
+        `;
+        
+        // Corpo
+        const body = document.createElement('div');
+        body.style.cssText = 'padding: 20px;';
+        
+        // Informações da OS
+        const osInfo = document.createElement('div');
+        osInfo.style.cssText = 'background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;';
+        osInfo.innerHTML = `
+            <h3 style="margin-top: 0; color: #1976d2;">📄 Detalhes da Ordem de Serviço</h3>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                <div>
+                    <strong style="color: #666;">Cliente:</strong><br>
+                    <span>${ordem.clientName || 'N/A'}</span>
+                </div>
+                <div>
+                    <strong style="color: #666;">Aparelho:</strong><br>
+                    <span>${ordem.deviceInfo || 'N/A'}</span>
+                </div>
+                <div>
+                    <strong style="color: #666;">Problema:</strong><br>
+                    <span>${ordem.summary || 'N/A'}</span>
+                </div>
+                <div>
+                    <strong style="color: #666;">Serviço Realizado:</strong><br>
+                    <span>${ordem.service || 'Aguardando serviço'}</span>
+                </div>
+                ${ordem.valor ? `
+                <div>
+                    <strong style="color: #666;">Valor:</strong><br>
+                    <span style="color: #28a745; font-size: 18px; font-weight: bold;">R$ ${parseFloat(ordem.valor).toFixed(2)}</span>
+                </div>
+                ` : ''}
+                <div>
+                    <strong style="color: #666;">Status:</strong><br>
+                    <span class="status-badge status-${ordem.status}">${this.formatStatusName(ordem.status)}</span>
+                </div>
+            </div>
+        `;
+        body.appendChild(osInfo);
+        
+        // Fotos
+        if (atendimento) {
+            const photosSection = document.createElement('div');
+            photosSection.style.cssText = 'margin: 20px 0;';
+            
+            let photosHTML = '<h3 style="color: #1976d2;">📸 Registros Fotográficos</h3>';
+            photosHTML += '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">';
+            
+            // Fotos de Entrada
+            photosHTML += '<div>';
+            photosHTML += '<h4 style="color: #0066cc;">📥 Fotos de Entrada</h4>';
+            if (atendimento.fotosEntrada && atendimento.fotosEntrada.length > 0) {
+                photosHTML += '<div style="display: grid; gap: 10px;">';
+                atendimento.fotosEntrada.forEach((foto, index) => {
+                    photosHTML += `<img src="${foto}" alt="Foto Entrada ${index + 1}" style="width: 100%; border-radius: 8px; cursor: pointer; border: 2px solid #0066cc;" onclick="dashboard.viewPhotoFullScreen('${foto}')">`;
+                });
+                photosHTML += '</div>';
+                if (atendimento.observacoesEntrada) {
+                    photosHTML += `<div style="margin-top: 10px; padding: 10px; background: #e3f2fd; border-radius: 4px; font-size: 13px;"><strong>Observações:</strong><br>${atendimento.observacoesEntrada}</div>`;
+                }
+            } else {
+                photosHTML += '<p style="color: #999; font-style: italic;">Sem fotos de entrada</p>';
+            }
+            photosHTML += '</div>';
+            
+            // Fotos de Saída
+            photosHTML += '<div>';
+            photosHTML += '<h4 style="color: #28a745;">📤 Fotos de Saída</h4>';
+            if (atendimento.fotosSaida && atendimento.fotosSaida.length > 0) {
+                photosHTML += '<div style="display: grid; gap: 10px;">';
+                atendimento.fotosSaida.forEach((foto, index) => {
+                    photosHTML += `<img src="${foto}" alt="Foto Saída ${index + 1}" style="width: 100%; border-radius: 8px; cursor: pointer; border: 2px solid #28a745;" onclick="dashboard.viewPhotoFullScreen('${foto}')">`;
+                });
+                photosHTML += '</div>';
+                if (atendimento.observacoesSaida) {
+                    photosHTML += `<div style="margin-top: 10px; padding: 10px; background: #d4edda; border-radius: 4px; font-size: 13px;"><strong>Observações:</strong><br>${atendimento.observacoesSaida}</div>`;
+                }
+            } else {
+                photosHTML += '<p style="color: #999; font-style: italic;">Sem fotos de saída</p>';
+            }
+            photosHTML += '</div>';
+            
+            photosHTML += '</div>';
+            photosSection.innerHTML = photosHTML;
+            body.appendChild(photosSection);
+        }
+        
+        // Assinatura
+        const signatureSection = document.createElement('div');
+        signatureSection.style.cssText = 'margin: 20px 0; padding: 20px; background: #fff3cd; border-radius: 8px; border: 2px solid #ffc107;';
+        signatureSection.innerHTML = `
+            <h3 style="margin-top: 0; color: #856404;">✍️ Assinatura do Cliente</h3>
+            <img src="${ordem.signature}" alt="Assinatura" style="width: 100%; max-width: 400px; border: 2px solid #856404; border-radius: 4px; background: white; padding: 10px;">
+            <p style="margin-top: 10px; font-size: 13px; color: #856404;">Assinado digitalmente em ${new Date(ordem.signedAt).toLocaleString('pt-BR')}</p>
+        `;
+        body.appendChild(signatureSection);
+        
+        // Botões de ação
+        const actions = document.createElement('div');
+        actions.style.cssText = 'display: flex; gap: 10px; justify-content: flex-end; padding-top: 20px; border-top: 1px solid #ddd;';
+        actions.innerHTML = `
+            <button onclick="dashboard.printSignedOS('${id}')" class="btn btn-primary">🖨️ Imprimir</button>
+            <button onclick="this.closest('.modal').remove()" class="btn btn-secondary">✖️ Fechar</button>
+        `;
+        body.appendChild(actions);
+        
+        modalContent.appendChild(header);
+        modalContent.appendChild(body);
+        modal.appendChild(modalContent);
+        
+        modal.onclick = () => modal.remove();
+        document.body.appendChild(modal);
+    }
+    
+    printSignedOS(id) {
+        // Funcionalidade de impressão (pode ser implementada futuramente)
+        this.showNotification('Funcionalidade de impressão em desenvolvimento', 'info');
     }
 
     async finalizeOS(id) {
