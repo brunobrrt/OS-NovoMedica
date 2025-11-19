@@ -3120,42 +3120,55 @@ class OSDashboard {
     }
 
     // Funções para gerenciar fotos de saída
-    openFotosSaida(atendimentoId) {
+    openFotosSaida(itemId) {
+        console.log('openFotosSaida called with ID:', itemId, 'type:', typeof itemId);
+        
         // Buscar em todos os arrays possíveis
         const atendimentos = JSON.parse(localStorage.getItem('mockAtendimentos') || '[]');
         const ordensServico = JSON.parse(localStorage.getItem('mockOrdens') || '[]');
         
-        let atendimento = atendimentos.find(a => a.id === atendimentoId);
+        console.log('Searching in atendimentos:', atendimentos.length, 'OS:', ordensServico.length);
+        console.log('All atendimento IDs:', atendimentos.map(a => a.id));
+        console.log('All OS IDs:', ordensServico.map(o => o.id));
+        
+        let item = atendimentos.find(a => a.id == itemId || a.id === itemId);
+        let itemType = 'atendimento';
         
         // Se não encontrou em atendimentos, buscar em OS
-        if (!atendimento) {
-            atendimento = ordensServico.find(o => o.id === atendimentoId);
+        if (!item) {
+            item = ordensServico.find(o => o.id == itemId || o.id === itemId);
+            itemType = 'os';
+            console.log('Found in OS:', !!item);
+        } else {
+            console.log('Found in atendimentos:', !!item);
         }
         
-        if (!atendimento) {
-            this.showNotification('Atendimento não encontrado', 'error');
+        if (!item) {
+            console.error('Item not found with ID:', itemId);
+            this.showNotification('Item não encontrado. ID: ' + itemId, 'error');
             return;
         }
 
         const clients = JSON.parse(localStorage.getItem('mockClients') || '[]');
         const devices = JSON.parse(localStorage.getItem('mockDevices') || '[]');
-        const client = clients.find(c => c.id === atendimento.clientId);
-        const device = devices.find(d => d.id === atendimento.deviceId);
+        const client = clients.find(c => c.id === item.clientId);
+        const device = devices.find(d => d.id === item.deviceId);
 
-        document.getElementById('fotos-saida-item-id').value = atendimentoId;
-        document.getElementById('fotos-saida-cliente').textContent = client ? client.name : 'N/A';
-        document.getElementById('fotos-saida-aparelho').textContent = device ? `${device.brand} ${device.model}` : atendimento.summary || 'N/A';
+        document.getElementById('fotos-saida-item-id').value = itemId;
+        document.getElementById('fotos-saida-cliente').textContent = client ? (client.name || client.nome) : item.clientName || 'N/A';
+        document.getElementById('fotos-saida-aparelho').textContent = device ? `${device.brand} ${device.model}` : item.deviceInfo || item.summary || 'N/A';
         document.getElementById('fotos-saida-serial').textContent = device ? (device.imei || 'N/A') : 'N/A';
         
         // Carregar fotos e observações salvas
-        this.loadFotosPreview('saida', atendimento.fotosSaida || []);
-        document.getElementById('fotos-saida-obs').value = atendimento.fotosSaidaObs || '';
+        this.loadFotosPreview('saida', item.fotosSaida || []);
+        document.getElementById('fotos-saida-obs').value = item.fotosSaidaObs || item.observacoesSaida || '';
         
         // Setup file upload handler
         const uploadInput = document.getElementById('fotos-saida-upload');
         uploadInput.value = '';
         uploadInput.onchange = (e) => this.handleFotosUpload(e, 'saida');
         
+        console.log('Opening modal with', (item.fotosSaida || []).length, 'existing photos');
         this.openModal('fotos-saida-modal');
     }
 
@@ -3174,8 +3187,8 @@ class OSDashboard {
         let targetKey = null;
         let index = -1;
         
-        // Tentar encontrar em atendimentos
-        index = atendimentos.findIndex(a => a.id === atendimentoId);
+        // Tentar encontrar em atendimentos (usar == para comparar string e number)
+        index = atendimentos.findIndex(a => a.id == atendimentoId || a.id === atendimentoId);
         if (index !== -1) {
             found = true;
             targetArray = atendimentos;
@@ -3185,7 +3198,7 @@ class OSDashboard {
         
         // Se não encontrou, buscar em OS
         if (!found) {
-            index = ordensServico.findIndex(o => o.id === atendimentoId);
+            index = ordensServico.findIndex(o => o.id == atendimentoId || o.id === atendimentoId);
             if (index !== -1) {
                 found = true;
                 targetArray = ordensServico;
@@ -3195,8 +3208,10 @@ class OSDashboard {
         }
         
         if (!found) {
-            console.error('Atendimento não encontrado:', atendimentoId);
-            this.showNotification('Atendimento não encontrado', 'error');
+            console.error('Item não encontrado:', atendimentoId);
+            console.log('All atendimento IDs:', atendimentos.map(a => a.id));
+            console.log('All OS IDs:', ordensServico.map(o => o.id));
+            this.showNotification('Item não encontrado. ID: ' + atendimentoId, 'error');
             return;
         }
 
