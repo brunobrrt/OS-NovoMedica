@@ -3573,25 +3573,37 @@ class OSDashboard {
 
     // Visualizar fotos de atendimento
     viewAtendimentoFotos(atendimentoId) {
-        const atendimentos = JSON.parse(localStorage.getItem('mockAtendimentos') || '[]');
-        const atendimento = atendimentos.find(a => a.id === atendimentoId);
+        console.log('viewAtendimentoFotos chamado com ID:', atendimentoId);
         
-        if (!atendimento) {
-            this.showNotification('Atendimento não encontrado', 'error');
+        // Buscar em atendimentos
+        const atendimentos = JSON.parse(localStorage.getItem('mockAtendimentos') || '[]');
+        let item = atendimentos.find(a => a.id == atendimentoId || a.id === atendimentoId);
+        
+        // Se não encontrou em atendimentos, buscar em ordens
+        if (!item) {
+            console.log('Não encontrado em atendimentos, buscando em ordens...');
+            const ordens = JSON.parse(localStorage.getItem('mockOrdens') || '[]');
+            item = ordens.find(o => o.id == atendimentoId || o.id === atendimentoId);
+        }
+        
+        if (!item) {
+            console.error('Item não encontrado em atendimentos nem ordens. ID:', atendimentoId);
+            this.showNotification('Item não encontrado', 'error');
             return;
         }
 
+        console.log('Item encontrado:', item);
         const clients = JSON.parse(localStorage.getItem('mockClients') || '[]');
         const devices = JSON.parse(localStorage.getItem('mockDevices') || '[]');
-        const client = clients.find(c => c.id === atendimento.clientId);
-        const device = devices.find(d => d.id === atendimento.deviceId);
+        const client = clients.find(c => c.id === item.clientId);
+        const device = devices.find(d => d.id === item.deviceId);
 
-        // Preencher informações do atendimento
-        document.getElementById('view-fotos-os-id').textContent = atendimento.id.substring(0, 8) + '...';
-        document.getElementById('view-fotos-cliente').textContent = client ? client.name : 'N/A';
-        document.getElementById('view-fotos-aparelho').textContent = device ? `${device.brand} ${device.model}` : atendimento.summary || 'N/A';
+        // Preencher informações
+        document.getElementById('view-fotos-os-id').textContent = item.id.substring(0, 8) + '...';
+        document.getElementById('view-fotos-cliente').textContent = item.clientName || (client ? client.name : 'N/A');
+        document.getElementById('view-fotos-aparelho').textContent = item.deviceInfo || (device ? `${device.brand} ${device.model}` : item.summary || 'N/A');
 
-        this.renderFotosView(atendimento);
+        this.renderFotosView(item);
         this.openModal('view-os-fotos-modal');
     }
 
