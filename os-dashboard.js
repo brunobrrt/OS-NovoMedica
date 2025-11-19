@@ -908,7 +908,7 @@ class OSDashboard {
             <td>${item.notes || item.summary || 'N/A'}</td>
             <td>
                 <button class="btn btn-sm ${fotosCount > 0 ? 'btn-success' : 'btn-warning'}" onclick="dashboard.openFotosSaida('${item.id}')">${fotosStatus}</button>
-                ${fotosCount > 0 ? `<button class="btn btn-sm btn-info" onclick="dashboard.viewAtendimentoFotos('${item.id}')" title="Ver fotos">👁️</button>` : ''}
+                ${fotosCount > 0 ? `<button class="btn btn-sm btn-info" onclick="dashboard.viewAtendimentoFotos('${item.id}')" title="Ver fotos">Ver Fotos</button>` : ''}
             </td>
             <td>
                 <div class="action-buttons">
@@ -2252,10 +2252,10 @@ class OSDashboard {
         
         if (photosContent.style.display === 'none') {
             photosContent.style.display = 'block';
-            toggleBtn.innerHTML = '🙈 Ocultar Fotos';
+            toggleBtn.innerHTML = ' Ocultar Fotos';
         } else {
             photosContent.style.display = 'none';
-            toggleBtn.innerHTML = '👁️ Ver Fotos';
+            toggleBtn.innerHTML = ' Ver Fotos';
         }
     }
     
