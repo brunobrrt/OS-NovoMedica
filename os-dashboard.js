@@ -1335,9 +1335,11 @@ class OSDashboard {
         const data = {
             clientId: clientId,
             client: client || { id: clientId, name: 'Cliente não encontrado' },
+            clientName: client ? client.name : 'Cliente não encontrado',
             summary: document.getElementById('os-summary').value,
             technician: document.getElementById('os-technician').value,
-            status: document.getElementById('os-status').value
+            status: document.getElementById('os-status').value,
+            service: document.getElementById('os-service').value || 'Aguardando serviço'
         };
 
         try {
@@ -1987,6 +1989,7 @@ class OSDashboard {
             document.getElementById('os-id').value = ordem.id;
             document.getElementById('os-client').value = ordem.clientId;
             document.getElementById('os-summary').value = ordem.summary;
+            document.getElementById('os-service').value = ordem.service || '';
             document.getElementById('os-technician').value = ordem.technician || '';
             document.getElementById('os-status').value = ordem.status;
             
