@@ -8,25 +8,39 @@ class ClientManager {
     }
 
     init() {
-        // Verificar autenticação
-        if (!authSystem.requireAuth()) {
-            return;
+        // Sistema simplificado - sem validação estrita do Firebase
+        // Verificar se há usuário no localStorage
+        let user = localStorage.getItem('currentUser');
+        
+        if (!user) {
+            const tempUser = {
+                id: 'temp-user',
+                email: 'usuario@sistema.com',
+                name: 'Usuário do Sistema',
+                role: 'admin'
+            };
+            localStorage.setItem('currentUser', JSON.stringify(tempUser));
+            user = JSON.stringify(tempUser);
         }
 
         // Atualizar email do usuário
-        const user = authSystem.getCurrentUser();
-        if (user) {
+        try {
+            const userData = JSON.parse(user);
             const userEmailElement = document.getElementById('userEmail');
             if (userEmailElement) {
-                userEmailElement.textContent = user.email;
+                userEmailElement.textContent = userData.email || 'Usuário';
             }
+        } catch (e) {
+            console.warn('Erro ao parsear dados do usuário:', e);
         }
 
         // Configurar logout
         const logoutButton = document.getElementById('logoutButton');
         if (logoutButton) {
             logoutButton.addEventListener('click', () => {
-                authSystem.logout();
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('authToken');
+                window.location.href = 'index.html';
             });
         }
 
@@ -163,13 +177,19 @@ class ClientManager {
         // Filtrar clientes
         let filteredClients = this.clients;
         if (searchTerm) {
-            filteredClients = this.clients.filter(c =>
-                c.nome.toLowerCase().includes(searchTerm) ||
-                (c.telefone && c.telefone.includes(searchTerm)) ||
-                (c.cpfCnpj && c.cpfCnpj.includes(searchTerm)) ||
-                (c.email && c.email.toLowerCase().includes(searchTerm)) ||
-                (c.qrCode && c.qrCode.toLowerCase().includes(searchTerm))
-            );
+            filteredClients = this.clients.filter(c => {
+                const nome = c.nome || c.name || '';
+                const telefone = c.telefone || c.phone || '';
+                const cpfCnpj = c.cpfCnpj || '';
+                const email = c.email || '';
+                const qrCode = c.qrCode || '';
+                
+                return nome.toLowerCase().includes(searchTerm) ||
+                    telefone.includes(searchTerm) ||
+                    cpfCnpj.includes(searchTerm) ||
+                    email.toLowerCase().includes(searchTerm) ||
+                    qrCode.toLowerCase().includes(searchTerm);
+            });
         }
 
         if (filteredClients.length === 0) {
@@ -186,12 +206,17 @@ class ClientManager {
 
     createClientRow(client, deviceCount) {
         const tr = document.createElement('tr');
+        const clientName = client.nome || client.name || '-';
+        const clientPhone = client.telefone || client.phone || '-';
+        const clientCpf = client.cpfCnpj || '-';
+        const clientEmail = client.email || '-';
+        
         tr.innerHTML = `
             <td><span class="qr-code-badge">${client.qrCode}</span></td>
-            <td>${client.nome}</td>
-            <td>${client.telefone || '-'}</td>
-            <td>${client.cpfCnpj || '-'}</td>
-            <td>${client.email || '-'}</td>
+            <td>${clientName}</td>
+            <td>${clientPhone}</td>
+            <td>${clientCpf}</td>
+            <td>${clientEmail}</td>
             <td><span class="badge badge-info">${deviceCount} aparelho${deviceCount !== 1 ? 's' : ''}</span></td>
             <td>
                 <div class="action-buttons">
@@ -273,10 +298,13 @@ class ClientManager {
         const clientId = document.getElementById('client-id').value;
         const data = {
             id: clientId || this.generateId(),
+            name: document.getElementById('client-name').value,
             nome: document.getElementById('client-name').value,
+            phone: document.getElementById('client-phone').value,
             telefone: document.getElementById('client-phone').value,
             cpfCnpj: document.getElementById('client-cpf-cnpj').value,
             email: document.getElementById('client-email').value,
+            address: document.getElementById('client-address').value,
             endereco: document.getElementById('client-address').value,
             qrCode: clientId ? this.clients.find(c => c.id === clientId).qrCode : this.generateQRCode(),
             createdAt: clientId ? this.clients.find(c => c.id === clientId).createdAt : new Date().toISOString(),
@@ -310,6 +338,7 @@ class ClientManager {
 
     deleteClient(clientId) {
         const client = this.clients.find(c => c.id === clientId);
+        const clientName = client.nome || client.name || 'Cliente';
         const clientDevices = this.devices.filter(d => d.ownerId === clientId);
 
         if (clientDevices.length > 0) {
@@ -324,7 +353,7 @@ class ClientManager {
             });
             localStorage.setItem('mockDevices', JSON.stringify(this.devices));
         } else {
-            if (!confirm(`Deseja realmente excluir o cliente "${client.nome}"?`)) {
+            if (!confirm(`Deseja realmente excluir o cliente "${clientName}"?`)) {
                 return;
             }
         }
