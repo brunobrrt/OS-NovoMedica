@@ -491,8 +491,8 @@ class OSDashboard {
                 mockOrdens = mockOrdens.filter(o => o.status === status);
             } else {
                 // Se nenhum status foi selecionado ("Todos os Status"), ocultar status que não são pendentes
-                // Ocultar: signed, aparelho_pronto, periodo_testes (estes vão para lista de saída)
-                const hiddenStatuses = ['signed', 'aparelho_pronto', 'periodo_testes', 'finalized', 'paid', 'awaiting_payment'];
+                // Ocultar: signed, aparelho_pronto (estes vão para lista de saída)
+                const hiddenStatuses = ['signed', 'aparelho_pronto', 'finalized', 'paid', 'awaiting_payment'];
                 mockOrdens = mockOrdens.filter(o => !hiddenStatuses.includes(o.status));
             }
 
@@ -1692,9 +1692,9 @@ class OSDashboard {
                 return;
             }
 
-            // Atualizar status para "signed" automaticamente
+            // Atualizar status para "aparelho_pronto" (para lista de saída) e "signed" 
             const oldStatus = allOrdens[osIndex].status;
-            allOrdens[osIndex].status = 'signed';
+            allOrdens[osIndex].status = 'aparelho_pronto';
             allOrdens[osIndex].signedAt = new Date().toISOString();
             allOrdens[osIndex].signature = this.signatureCanvas.toDataURL();
             
@@ -1704,7 +1704,7 @@ class OSDashboard {
             }
             allOrdens[osIndex].statusHistory.push({
                 from: oldStatus,
-                to: 'signed',
+                to: 'aparelho_pronto',
                 timestamp: new Date().toISOString(),
                 changedBy: 'Cliente (Assinatura)'
             });
@@ -1712,12 +1712,13 @@ class OSDashboard {
             // Salvar no localStorage
             localStorage.setItem('mockOrdens', JSON.stringify(allOrdens));
             
-            this.showNotification('OS assinada com sucesso e movida para OS Assinadas', 'success');
+            this.showNotification('OS assinada com sucesso! Aparelho pronto para saída.', 'success');
             this.closeModal('signature-modal');
             
             // Recarregar as listas
             await this.loadOSPending();
             await this.loadOSSigned();
+            await this.loadSaidaAparelhos();
             await this.loadStats();
         } catch (error) {
             console.error('Erro ao salvar assinatura:', error);
@@ -1773,33 +1774,67 @@ class OSDashboard {
                 return;
             }
             
+            // Buscar dados do cliente e dispositivo
+            const clients = JSON.parse(localStorage.getItem('mockClients') || '[]');
+            const devices = JSON.parse(localStorage.getItem('mockDevices') || '[]');
+            const client = clients.find(c => c.id === atendimento.clientId);
+            const device = devices.find(d => d.id === atendimento.deviceId);
+            
+            // Tentar obter informações do aparelho de várias fontes
+            let deviceInfo = 'N/A';
+            if (device) {
+                deviceInfo = `${device.brand || ''} ${device.model || ''}`.trim() || device.name || 'Aparelho';
+            } else if (atendimento.deviceInfo) {
+                deviceInfo = atendimento.deviceInfo;
+            } else if (atendimento.device) {
+                deviceInfo = atendimento.device;
+            } else if (atendimento.summary) {
+                // Usar o summary como fallback
+                deviceInfo = atendimento.summary;
+            }
+            
+            // Criar nova OS diretamente com todos os dados
+            let ordens = JSON.parse(localStorage.getItem('mockOrdens') || '[]');
+            const newOS = {
+                id: Date.now().toString(),
+                atendimentoId: atendimentoId,
+                clientId: atendimento.clientId,
+                deviceId: atendimento.deviceId,
+                clientName: client ? (client.name || client.nome) : 'Cliente não encontrado',
+                deviceInfo: deviceInfo,
+                problem: atendimento.summary || atendimento.problem || 'N/A',
+                service: 'Aguardando serviço',
+                summary: atendimento.summary,
+                technician: '',
+                status: 'aguardando_assinatura',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                statusHistory: [{
+                    from: null,
+                    to: 'aguardando_assinatura',
+                    timestamp: new Date().toISOString(),
+                    changedBy: 'Sistema (Criação)'
+                }]
+            };
+            
+            ordens.push(newOS);
+            localStorage.setItem('mockOrdens', JSON.stringify(ordens));
+            
             // Atualizar status do atendimento para "os_criada"
             const atendimentoIndex = atendimentos.findIndex(a => a.id === atendimentoId);
             if (atendimentoIndex !== -1) {
                 atendimentos[atendimentoIndex].status = 'os_criada';
                 atendimentos[atendimentoIndex].osCreatedAt = new Date().toISOString();
+                atendimentos[atendimentoIndex].osId = newOS.id;
                 localStorage.setItem('mockAtendimentos', JSON.stringify(atendimentos));
             }
             
-            // Abrir modal de OS e preencher com dados do atendimento
-            document.getElementById('os-modal-title').textContent = 'Nova OS';
-            document.getElementById('os-form').reset();
-            document.getElementById('os-id').value = '';
+            this.showNotification('OS criada com sucesso! Atendimento marcado como "OS Criada".', 'success');
             
-            // Preencher cliente
-            document.getElementById('os-client').value = atendimento.clientId;
-            
-            // Preencher sumário com informações do atendimento
-            document.getElementById('os-summary').value = atendimento.summary;
-            
-            // Definir status padrão como "aguardando_assinatura"
-            document.getElementById('os-status').value = 'aguardando_assinatura';
-            
-            this.openModal('os-modal');
-            this.showNotification('OS criada a partir do atendimento. Atendimento marcado como "OS Criada"!', 'success');
-            
-            // Recarregar lista de atendimentos
+            // Recarregar listas
             this.loadAtendimentos();
+            this.loadOSPending();
+            this.loadStats();
         } catch (error) {
             console.error('Erro ao criar OS do atendimento:', error);
             this.showNotification('Erro ao criar OS', 'error');
