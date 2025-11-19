@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Usuários - OS NovoMedica</title>
+    <link rel="stylesheet" href="os-dashboard.css">
+    <style>
+        .users-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .users-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .users-header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        .btn-add-user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .btn-add-user:hover {
+            transform: translateY(-2px);
+        }
+
+        .users-table {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .users-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th {
+            background: #f8f9fa;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #e1e8ed;
+        }
+
+        .users-table td {
+            padding: 16px;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .users-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .users-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .role-admin {
+            background: #fee;
+            color: #c33;
+        }
+
+        .role-tecnico {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .role-atendente {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .btn-action {
+            padding: 6px 12px;
+            margin: 0 4px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-action:hover {
+            opacity: 0.8;
+        }
+
+        .btn-edit {
+            background: #2196f3;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        /* Modal */
+        .modal-user {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-user.show {
+            display: flex;
+        }
+
+        .modal-user-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-user-header {
+            margin-bottom: 24px;
+        }
+
+        .modal-user-header h2 {
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-group-user {
+            margin-bottom: 20px;
+        }
+
+        .form-group-user label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group-user input,
+        .form-group-user select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-group-user input:focus,
+        .form-group-user select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .btn-cancel {
+            background: #e1e8ed;
+            color: #333;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: #e1e8ed;
+            color: #333;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .btn-back:hover {
+            background: #d1d8dd;
+        }
+    </style>
+</head>
+<body>
+    <div class="users-container">
+        <a href="os-dashboard.html" class="btn-back">← Voltar ao Dashboard</a>
+        
+        <div class="users-header">
+            <h1>👥 Gerenciar Usuários</h1>
+            <button class="btn-add-user" id="btn-add-user">+ Novo Usuário</button>
+        </div>
+
+        <div class="users-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th>Perfil</th>
+                        <th>Criado em</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="users-tbody">
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px;">
+                            Carregando usuários...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Novo/Editar Usuário -->
+    <div class="modal-user" id="modal-user">
+        <div class="modal-user-content">
+            <div class="modal-user-header">
+                <h2 id="modal-user-title">Novo Usuário</h2>
+            </div>
+
+            <form id="form-user">
+                <input type="hidden" id="user-id">
+
+                <div class="form-group-user">
+                    <label for="user-name">Nome Completo *</label>
+                    <input type="text" id="user-name" required>
+                </div>
+
+                <div class="form-group-user">
+                    <label for="user-email">E-mail *</label>
+                    <input type="email" id="user-email" required>
+                </div>
+
+                <div class="form-group-user">
+                    <label for="user-password">Senha * <small>(mínimo 6 caracteres)</small></label>
+                    <input type="password" id="user-password" minlength="6">
+                </div>
+
+                <div class="form-group-user">
+                    <label for="user-role">Perfil *</label>
+                    <select id="user-role" required>
+                        <option value="">Selecione...</option>
+                        <option value="admin">Administrador</option>
+                        <option value="tecnico">Técnico</option>
+                        <option value="atendente">Atendente</option>
+                    </select>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="btn-cancel-user">Cancelar</button>
+                    <button type="submit" class="btn-save">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="usuarios.js"></script>
+</body>
+</html>
