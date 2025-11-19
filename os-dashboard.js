@@ -2145,14 +2145,14 @@ class OSDashboard {
         `;
         
         // Carregar fotos de entrada e saída
-        this.loadSignaturePhotos(atendimento);
+        this.loadSignaturePhotos(atendimento, ordem);
         
         this.clearSignature();
         this.currentOSId = id;
         this.openModal('signature-modal');
     }
     
-    loadSignaturePhotos(atendimento) {
+    loadSignaturePhotos(atendimento, ordem) {
         const entradaGallery = document.getElementById('signature-fotos-entrada-gallery');
         const saidaGallery = document.getElementById('signature-fotos-saida-gallery');
         const entradaObs = document.getElementById('signature-fotos-entrada-obs');
@@ -2166,12 +2166,36 @@ class OSDashboard {
         entradaObs.innerHTML = '';
         saidaObs.innerHTML = '';
         
+        // Coletar fotos de entrada de múltiplas fontes
+        let fotosEntrada = [];
+        let fotosEntradaObs = '';
+        if (atendimento && atendimento.fotosEntrada) {
+            fotosEntrada = atendimento.fotosEntrada;
+            fotosEntradaObs = atendimento.observacoesEntrada || atendimento.fotosEntradaObs || '';
+        }
+        if (ordem && ordem.fotosEntrada && ordem.fotosEntrada.length > 0) {
+            fotosEntrada = ordem.fotosEntrada;
+            fotosEntradaObs = ordem.fotosEntradaObs || fotosEntradaObs;
+        }
+        
+        // Coletar fotos de saída de múltiplas fontes
+        let fotosSaida = [];
+        let fotosSaidaObs = '';
+        if (atendimento && atendimento.fotosSaida) {
+            fotosSaida = atendimento.fotosSaida;
+            fotosSaidaObs = atendimento.observacoesSaida || atendimento.fotosSaidaObs || '';
+        }
+        if (ordem && ordem.fotosSaida && ordem.fotosSaida.length > 0) {
+            fotosSaida = ordem.fotosSaida;
+            fotosSaidaObs = ordem.fotosSaidaObs || fotosSaidaObs;
+        }
+        
         // Fotos de entrada
-        if (atendimento && atendimento.fotosEntrada && atendimento.fotosEntrada.length > 0) {
+        if (fotosEntrada.length > 0) {
             entradaEmpty.style.display = 'none';
             entradaGallery.style.display = 'grid';
             
-            atendimento.fotosEntrada.forEach((foto, index) => {
+            fotosEntrada.forEach((foto, index) => {
                 const img = document.createElement('img');
                 img.src = foto;
                 img.alt = `Foto de Entrada ${index + 1}`;
@@ -2180,8 +2204,8 @@ class OSDashboard {
                 entradaGallery.appendChild(img);
             });
             
-            if (atendimento.observacoesEntrada) {
-                entradaObs.innerHTML = `<strong>Observações:</strong><br>${atendimento.observacoesEntrada}`;
+            if (fotosEntradaObs) {
+                entradaObs.innerHTML = `<strong>Observações:</strong><br>${fotosEntradaObs}`;
                 entradaObs.style.display = 'block';
             } else {
                 entradaObs.style.display = 'none';
@@ -2193,11 +2217,11 @@ class OSDashboard {
         }
         
         // Fotos de saída
-        if (atendimento && atendimento.fotosSaida && atendimento.fotosSaida.length > 0) {
+        if (fotosSaida.length > 0) {
             saidaEmpty.style.display = 'none';
             saidaGallery.style.display = 'grid';
             
-            atendimento.fotosSaida.forEach((foto, index) => {
+            fotosSaida.forEach((foto, index) => {
                 const img = document.createElement('img');
                 img.src = foto;
                 img.alt = `Foto de Saída ${index + 1}`;
@@ -2206,8 +2230,8 @@ class OSDashboard {
                 saidaGallery.appendChild(img);
             });
             
-            if (atendimento.observacoesSaida) {
-                saidaObs.innerHTML = `<strong>Observações:</strong><br>${atendimento.observacoesSaida}`;
+            if (fotosSaidaObs) {
+                saidaObs.innerHTML = `<strong>Observações:</strong><br>${fotosSaidaObs}`;
                 saidaObs.style.display = 'block';
             } else {
                 saidaObs.style.display = 'none';
@@ -2270,6 +2294,29 @@ class OSDashboard {
         // Carregar atendimento relacionado para pegar fotos
         const allAtendimentos = JSON.parse(localStorage.getItem('mockAtendimentos') || '[]');
         const atendimento = allAtendimentos.find(a => a.id === ordem.atendimentoId);
+        
+        // Se não encontrou atendimento, tentar buscar pela própria OS (pode ter fotos salvas direto nela)
+        let fotosEntrada = [];
+        let fotosEntradaObs = '';
+        let fotosSaida = [];
+        let fotosSaidaObs = '';
+        
+        if (atendimento) {
+            fotosEntrada = atendimento.fotosEntrada || [];
+            fotosEntradaObs = atendimento.observacoesEntrada || atendimento.fotosEntradaObs || '';
+            fotosSaida = atendimento.fotosSaida || [];
+            fotosSaidaObs = atendimento.observacoesSaida || atendimento.fotosSaidaObs || '';
+        }
+        
+        // Sobrescrever com fotos da OS se existirem
+        if (ordem.fotosEntrada && ordem.fotosEntrada.length > 0) {
+            fotosEntrada = ordem.fotosEntrada;
+            fotosEntradaObs = ordem.fotosEntradaObs || fotosEntradaObs;
+        }
+        if (ordem.fotosSaida && ordem.fotosSaida.length > 0) {
+            fotosSaida = ordem.fotosSaida;
+            fotosSaidaObs = ordem.fotosSaidaObs || fotosSaidaObs;
+        }
         
         // Criar modal personalizado para visualização
         const modal = document.createElement('div');
@@ -2336,51 +2383,49 @@ class OSDashboard {
         body.appendChild(osInfo);
         
         // Fotos
-        if (atendimento) {
-            const photosSection = document.createElement('div');
-            photosSection.style.cssText = 'margin: 20px 0;';
-            
-            let photosHTML = '<h3 style="color: #1976d2;">📸 Registros Fotográficos</h3>';
-            photosHTML += '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">';
-            
-            // Fotos de Entrada
-            photosHTML += '<div>';
-            photosHTML += '<h4 style="color: #0066cc;">📥 Fotos de Entrada</h4>';
-            if (atendimento.fotosEntrada && atendimento.fotosEntrada.length > 0) {
-                photosHTML += '<div style="display: grid; gap: 10px;">';
-                atendimento.fotosEntrada.forEach((foto, index) => {
-                    photosHTML += `<img src="${foto}" alt="Foto Entrada ${index + 1}" style="width: 100%; border-radius: 8px; cursor: pointer; border: 2px solid #0066cc;" onclick="dashboard.viewPhotoFullScreen('${foto}')">`;
-                });
-                photosHTML += '</div>';
-                if (atendimento.observacoesEntrada) {
-                    photosHTML += `<div style="margin-top: 10px; padding: 10px; background: #e3f2fd; border-radius: 4px; font-size: 13px;"><strong>Observações:</strong><br>${atendimento.observacoesEntrada}</div>`;
-                }
-            } else {
-                photosHTML += '<p style="color: #999; font-style: italic;">Sem fotos de entrada</p>';
+        const photosSection = document.createElement('div');
+        photosSection.style.cssText = 'margin: 20px 0;';
+        
+        let photosHTML = '<h3 style="color: #1976d2;">📸 Registros Fotográficos</h3>';
+        photosHTML += '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">';
+        
+        // Fotos de Entrada
+        photosHTML += '<div>';
+        photosHTML += '<h4 style="color: #0066cc;">📥 Fotos de Entrada</h4>';
+        if (fotosEntrada.length > 0) {
+            photosHTML += '<div style="display: grid; gap: 10px;">';
+            fotosEntrada.forEach((foto, index) => {
+                photosHTML += `<img src="${foto}" alt="Foto Entrada ${index + 1}" style="width: 100%; border-radius: 8px; cursor: pointer; border: 2px solid #0066cc;" onclick="dashboard.viewPhotoFullScreen('${foto}')">`;
+            });
+            photosHTML += '</div>';
+            if (fotosEntradaObs) {
+                photosHTML += `<div style="margin-top: 10px; padding: 10px; background: #e3f2fd; border-radius: 4px; font-size: 13px;"><strong>Observações:</strong><br>${fotosEntradaObs}</div>`;
             }
-            photosHTML += '</div>';
-            
-            // Fotos de Saída
-            photosHTML += '<div>';
-            photosHTML += '<h4 style="color: #28a745;">📤 Fotos de Saída</h4>';
-            if (atendimento.fotosSaida && atendimento.fotosSaida.length > 0) {
-                photosHTML += '<div style="display: grid; gap: 10px;">';
-                atendimento.fotosSaida.forEach((foto, index) => {
-                    photosHTML += `<img src="${foto}" alt="Foto Saída ${index + 1}" style="width: 100%; border-radius: 8px; cursor: pointer; border: 2px solid #28a745;" onclick="dashboard.viewPhotoFullScreen('${foto}')">`;
-                });
-                photosHTML += '</div>';
-                if (atendimento.observacoesSaida) {
-                    photosHTML += `<div style="margin-top: 10px; padding: 10px; background: #d4edda; border-radius: 4px; font-size: 13px;"><strong>Observações:</strong><br>${atendimento.observacoesSaida}</div>`;
-                }
-            } else {
-                photosHTML += '<p style="color: #999; font-style: italic;">Sem fotos de saída</p>';
-            }
-            photosHTML += '</div>';
-            
-            photosHTML += '</div>';
-            photosSection.innerHTML = photosHTML;
-            body.appendChild(photosSection);
+        } else {
+            photosHTML += '<p style="color: #999; font-style: italic;">Sem fotos de entrada</p>';
         }
+        photosHTML += '</div>';
+        
+        // Fotos de Saída
+        photosHTML += '<div>';
+        photosHTML += '<h4 style="color: #28a745;">📤 Fotos de Saída</h4>';
+        if (fotosSaida.length > 0) {
+            photosHTML += '<div style="display: grid; gap: 10px;">';
+            fotosSaida.forEach((foto, index) => {
+                photosHTML += `<img src="${foto}" alt="Foto Saída ${index + 1}" style="width: 100%; border-radius: 8px; cursor: pointer; border: 2px solid #28a745;" onclick="dashboard.viewPhotoFullScreen('${foto}')">`;
+            });
+            photosHTML += '</div>';
+            if (fotosSaidaObs) {
+                photosHTML += `<div style="margin-top: 10px; padding: 10px; background: #d4edda; border-radius: 4px; font-size: 13px;"><strong>Observações:</strong><br>${fotosSaidaObs}</div>`;
+            }
+        } else {
+            photosHTML += '<p style="color: #999; font-style: italic;">Sem fotos de saída</p>';
+        }
+        photosHTML += '</div>';
+        
+        photosHTML += '</div>';
+        photosSection.innerHTML = photosHTML;
+        body.appendChild(photosSection);
         
         // Assinatura
         const signatureSection = document.createElement('div');
