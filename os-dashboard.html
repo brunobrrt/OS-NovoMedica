@@ -134,6 +134,16 @@
                 <div class="stat-number" id="stat-a-caminho">0</div>
                 <small>Em trânsito</small>
             </div>
+            <div class="stat-card" data-status="entrada_aparelho">
+                <h3>Entrada de Aparelho</h3>
+                <div class="stat-number" id="stat-entrada-aparelho">0</div>
+                <small>Cadastro de entrada</small>
+            </div>
+            <div class="stat-card" data-status="atendimento_online">
+                <h3>Atendimento Online</h3>
+                <div class="stat-number" id="stat-atendimento-online">0</div>
+                <small>Suporte remoto</small>
+            </div>
             
             <!-- Status de OS -->
             <div class="stat-card" data-status="aguardando_assinatura">
@@ -176,7 +186,9 @@
                     <div class="panel-controls">
                         <select id="filter-atendimentos">
                             <option value="">Todos os Status</option>
+                            <option value="entrada_aparelho">Entrada de Aparelho</option>
                             <option value="pendente">Pendente</option>
+                            <option value="atendimento_online">Atendimento Online</option>
                             <option value="aguardando_orcamento">Aguardando Orçamento</option>
                             <option value="aguardando_pecas">Aguardando Peças</option>
                             <option value="em_manutencao">Em Manutenção</option>
@@ -555,7 +567,9 @@
                     <div class="form-group">
                         <label for="atendimento-status">Status:</label>
                         <select id="atendimento-status" required>
+                            <option value="entrada_aparelho">Entrada de Aparelho</option>
                             <option value="pendente">Pendente</option>
+                            <option value="atendimento_online">Atendimento Online</option>
                             <option value="aguardando_orcamento">Aguardando Orçamento</option>
                             <option value="aguardando_pecas">Aguardando Peças</option>
                             <option value="em_manutencao">Em Manutenção</option>

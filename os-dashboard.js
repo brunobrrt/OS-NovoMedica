@@ -336,6 +336,8 @@ class OSDashboard {
             document.getElementById('stat-reprovado').textContent = atendimentos.filter(a => a.status === 'reprovado_esperando_devolucao').length;
             document.getElementById('stat-aguardando-visita').textContent = atendimentos.filter(a => a.status === 'aguardando_visita_tecnica').length;
             document.getElementById('stat-a-caminho').textContent = atendimentos.filter(a => a.status === 'aparelho_a_caminho').length;
+            document.getElementById('stat-entrada-aparelho').textContent = atendimentos.filter(a => a.status === 'entrada_aparelho').length;
+            document.getElementById('stat-atendimento-online').textContent = atendimentos.filter(a => a.status === 'atendimento_online').length;
             
             // Estatísticas de OS por status
             document.getElementById('stat-os-aguardando-assinatura').textContent = ordens.filter(o => o.status === 'aguardando_assinatura').length;
@@ -379,8 +381,8 @@ class OSDashboard {
 
             let filteredData = mockAtendimentos;
             
-            // Ocultar atendimentos finalizados e recusados por padrão
-            const hiddenStatuses = ['os_criada', 'atendimento_finalizado', 'recusado'];
+            // Ocultar atendimentos finalizados, recusados e entrada de aparelho por padrão
+            const hiddenStatuses = ['entrada_aparelho', 'os_criada', 'atendimento_finalizado', 'recusado'];
             
             if (status) {
                 // Se um status específico foi selecionado, filtrar por ele
@@ -441,7 +443,9 @@ class OSDashboard {
 
     formatStatusName(status) {
         const statusNames = {
+            'entrada_aparelho': 'Entrada de Aparelho',
             'pendente': 'Pendente',
+            'atendimento_online': 'Atendimento Online',
             'aguardando_assinatura': 'Aguardando Assinatura',
             'aguardando_orcamento': 'Aguardando Orçamento',
             'aguardando_pecas': 'Aguardando Peças',
@@ -748,12 +752,12 @@ class OSDashboard {
             empty.style.display = 'none';
             tbody.innerHTML = '';
 
-            // Carregar atendimentos que estão em status de entrada (recém-criados ou a caminho)
+            // Carregar atendimentos que estão em status de entrada (apenas Entrada de Aparelho)
             const allAtendimentos = JSON.parse(localStorage.getItem('mockAtendimentos') || '[]');
             const clients = JSON.parse(localStorage.getItem('mockClients') || '[]');
             const devices = JSON.parse(localStorage.getItem('mockDevices') || '[]');
             
-            const entradaStatuses = ['pendente', 'aparelho_a_caminho', 'aguardando_orcamento'];
+            const entradaStatuses = ['entrada_aparelho'];
             const entradaItems = allAtendimentos.filter(a => entradaStatuses.includes(a.status));
 
             entradaItems.forEach(item => {
@@ -869,6 +873,9 @@ class OSDashboard {
         const hasObs = item.fotosSaidaObs ? '📝' : '';
         const fotosStatus = fotosCount > 0 ? `✅ ${fotosCount} foto${fotosCount > 1 ? 's' : ''} ${hasObs}` : '📷 Adicionar';
         
+        // Verificar se tem assinatura
+        const hasSignature = item.signature ? true : false;
+        
         // Ações diferentes para OS e Atendimento
         let actions = '';
         if (tipo === 'atendimento') {
@@ -880,6 +887,7 @@ class OSDashboard {
             actions = `
                 <button class="btn btn-info btn-sm" onclick="dashboard.viewOS('${item.id}')">Ver OS</button>
                 <button class="btn btn-warning btn-sm" onclick="dashboard.editOS('${item.id}')">Editar</button>
+                ${hasSignature ? `<button class="btn btn-primary btn-sm" onclick="dashboard.viewSignedOS('${item.id}')" title="Ver OS Assinada">📋 Ver Assinatura</button>` : ''}
                 <button class="btn btn-success btn-sm" onclick="dashboard.finalizarEntregaOS('${item.id}')">Finalizar Entrega</button>
             `;
         }
