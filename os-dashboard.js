@@ -3200,10 +3200,51 @@ class OSDashboard {
     }
 
     finalizarEntrega(atendimentoId) {
-        if (!confirm('Deseja finalizar a entrega deste aparelho ao cliente?')) {
+        const atendimentos = JSON.parse(localStorage.getItem('mockAtendimentos') || '[]');
+        const atendimento = atendimentos.find(a => a.id === atendimentoId);
+        
+        if (!atendimento) {
+            this.showNotification('Atendimento não encontrado', 'error');
             return;
         }
 
+        // Verificar se tem fotos de entrada e saída
+        const temFotosEntrada = atendimento.fotosEntrada && atendimento.fotosEntrada.length > 0;
+        const temFotosSaida = atendimento.fotosSaida && atendimento.fotosSaida.length > 0;
+
+        if (!temFotosEntrada && !temFotosSaida) {
+            if (!confirm('Este atendimento não possui fotos de entrada ou saída. Deseja finalizar mesmo assim?')) {
+                return;
+            }
+        } else {
+            // Mostrar fotos antes de confirmar finalização
+            this.viewAtendimentoFotos(atendimentoId);
+            
+            // Adicionar botão de confirmação no modal de fotos
+            setTimeout(() => {
+                const modal = document.getElementById('view-os-fotos-modal');
+                const existingBtn = document.getElementById('confirm-finalize-btn');
+                
+                if (!existingBtn) {
+                    const actionsDiv = modal.querySelector('.modal-body');
+                    const confirmBtn = document.createElement('div');
+                    confirmBtn.id = 'confirm-finalize-btn';
+                    confirmBtn.style.cssText = 'margin-top: 20px; text-align: center; padding: 20px; background: #fff3cd; border-radius: 8px;';
+                    confirmBtn.innerHTML = `
+                        <p style="margin-bottom: 15px; font-weight: bold;">Conferir as fotos antes de finalizar a entrega</p>
+                        <button class="btn btn-success" onclick="dashboard.confirmarFinalizarEntrega('${atendimentoId}')">✅ Confirmar Entrega</button>
+                        <button class="btn btn-secondary" onclick="dashboard.closeModal('view-os-fotos-modal'); document.getElementById('confirm-finalize-btn').remove();">❌ Cancelar</button>
+                    `;
+                    actionsDiv.appendChild(confirmBtn);
+                }
+            }, 100);
+            return;
+        }
+
+        this.confirmarFinalizarEntrega(atendimentoId);
+    }
+
+    confirmarFinalizarEntrega(atendimentoId) {
         const atendimentos = JSON.parse(localStorage.getItem('mockAtendimentos') || '[]');
         const index = atendimentos.findIndex(a => a.id === atendimentoId);
         
@@ -3220,16 +3261,63 @@ class OSDashboard {
         localStorage.setItem('mockAtendimentos', JSON.stringify(atendimentos));
         
         this.showNotification('Entrega finalizada com sucesso!', 'success');
+        
+        // Remover botão de confirmação se existir
+        const confirmBtn = document.getElementById('confirm-finalize-btn');
+        if (confirmBtn) confirmBtn.remove();
+        
+        this.closeModal('view-os-fotos-modal');
         this.loadSaidaAparelhos();
         this.loadAtendimentos();
-        this.updateStats();
+        this.loadStats();
     }
 
     finalizarEntregaOS(osId) {
-        if (!confirm('Deseja finalizar a entrega desta OS ao cliente?')) {
+        const ordens = JSON.parse(localStorage.getItem('mockOrdens') || '[]');
+        const ordem = ordens.find(o => o.id === osId);
+        
+        if (!ordem) {
+            this.showNotification('OS não encontrada', 'error');
             return;
         }
 
+        // Verificar se tem fotos de entrada e saída
+        const temFotosEntrada = ordem.fotosEntrada && ordem.fotosEntrada.length > 0;
+        const temFotosSaida = ordem.fotosSaida && ordem.fotosSaida.length > 0;
+
+        if (!temFotosEntrada && !temFotosSaida) {
+            if (!confirm('Esta OS não possui fotos de entrada ou saída. Deseja finalizar mesmo assim?')) {
+                return;
+            }
+        } else {
+            // Mostrar fotos antes de confirmar finalização
+            this.viewOSFotos(osId);
+            
+            // Adicionar botão de confirmação no modal de fotos
+            setTimeout(() => {
+                const modal = document.getElementById('view-os-fotos-modal');
+                const existingBtn = document.getElementById('confirm-finalize-os-btn');
+                
+                if (!existingBtn) {
+                    const actionsDiv = modal.querySelector('.modal-body');
+                    const confirmBtn = document.createElement('div');
+                    confirmBtn.id = 'confirm-finalize-os-btn';
+                    confirmBtn.style.cssText = 'margin-top: 20px; text-align: center; padding: 20px; background: #fff3cd; border-radius: 8px;';
+                    confirmBtn.innerHTML = `
+                        <p style="margin-bottom: 15px; font-weight: bold;">Conferir as fotos antes de finalizar a entrega</p>
+                        <button class="btn btn-success" onclick="dashboard.confirmarFinalizarEntregaOS('${osId}')">✅ Confirmar Entrega</button>
+                        <button class="btn btn-secondary" onclick="dashboard.closeModal('view-os-fotos-modal'); document.getElementById('confirm-finalize-os-btn').remove();">❌ Cancelar</button>
+                    `;
+                    actionsDiv.appendChild(confirmBtn);
+                }
+            }, 100);
+            return;
+        }
+
+        this.confirmarFinalizarEntregaOS(osId);
+    }
+
+    confirmarFinalizarEntregaOS(osId) {
         const ordens = JSON.parse(localStorage.getItem('mockOrdens') || '[]');
         const index = ordens.findIndex(o => o.id === osId);
         
@@ -3257,10 +3345,16 @@ class OSDashboard {
         localStorage.setItem('mockOrdens', JSON.stringify(ordens));
         
         this.showNotification('Entrega da OS finalizada com sucesso!', 'success');
+        
+        // Remover botão de confirmação se existir
+        const confirmBtn = document.getElementById('confirm-finalize-os-btn');
+        if (confirmBtn) confirmBtn.remove();
+        
+        this.closeModal('view-os-fotos-modal');
         this.loadSaidaAparelhos();
         this.loadOSPending();
         this.loadOSFinalized();
-        this.updateStats();
+        this.loadStats();
     }
 
     // Client list management
