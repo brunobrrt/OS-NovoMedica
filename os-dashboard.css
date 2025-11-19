@@ -596,6 +596,52 @@ table tbody tr:hover {
 }
 
 /* Responsivo */
+/* Tablets de alta resolução em modo retrato (Samsung Tab A7 e similares) */
+@media screen and (max-width: 1280px) and (orientation: portrait) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 3px 0 15px rgba(0,0,0,0.3);
+    }
+    
+    .main-content {
+        padding: 10px;
+        margin-left: 0;
+    }
+    
+    header {
+        margin: -10px -10px 15px -10px;
+        padding: 10px 15px;
+        position: relative;
+    }
+    
+    #menu-toggle {
+        display: block;
+    }
+    
+    header h1 {
+        font-size: 16px;
+        margin: 0;
+    }
+    
+    .header-actions {
+        display: none !important;
+    }
+    
+    .mobile-actions-btn {
+        display: flex;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 15px;
+    }
+}
+
 @media (max-width: 768px) {
     .sidebar {
         transform: translateX(-100%);
@@ -790,9 +836,41 @@ table tbody tr:hover {
 }
 
 /* Tablet Portrait Mode - Aplicar estilo mobile */
-@media screen and (min-width: 769px) and (max-width: 1024px) and (orientation: portrait) {
+@media screen and (min-width: 769px) and (max-width: 1280px) and (orientation: portrait) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 3px 0 15px rgba(0,0,0,0.3);
+    }
+    
     .main-content {
         padding: 10px;
+        margin-left: 0;
+    }
+    
+    header {
+        margin: -10px -10px 15px -10px;
+        padding: 10px 15px;
+        position: relative;
+    }
+    
+    #menu-toggle {
+        display: block;
+    }
+    
+    header h1 {
+        font-size: 16px;
+    }
+    
+    .header-actions {
+        display: none !important;
+    }
+    
+    .mobile-actions-btn {
+        display: flex;
     }
     
     .stats-grid {
@@ -834,6 +912,18 @@ table tbody tr:hover {
     #fotos-entrada-preview,
     #fotos-saida-preview {
         grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .panel-controls {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
     }
 }
 
