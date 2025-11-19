@@ -126,12 +126,6 @@ header h1 {
     margin-bottom: 30px;
 }
 
-@media screen and (min-width: 800px) and (max-width: 900px) {
-    .stats-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
 .stat-card {
     background: #fff;
     padding: 20px;
@@ -795,11 +789,15 @@ table tbody tr:hover {
     }
 }
 
-/* Tablet Portrait Mode (853x1280 and similar) */
+/* Tablet Portrait Mode - Aplicar estilo mobile */
 @media screen and (min-width: 769px) and (max-width: 1024px) and (orientation: portrait) {
+    .main-content {
+        padding: 10px;
+    }
+    
     .stats-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
     }
     
     .stat-card {
@@ -807,19 +805,11 @@ table tbody tr:hover {
     }
     
     .stat-card h3 {
-        font-size: 13px;
+        font-size: 12px;
     }
     
     .stat-number {
-        font-size: 24px;
-    }
-    
-    .main-content {
-        padding: 15px;
-    }
-    
-    .panel {
-        margin-bottom: 20px;
+        font-size: 22px;
     }
     
     .data-table {
@@ -839,6 +829,11 @@ table tbody tr:hover {
     .modal-content {
         width: 90%;
         max-width: 90%;
+    }
+    
+    #fotos-entrada-preview,
+    #fotos-saida-preview {
+        grid-template-columns: repeat(2, 1fr) !important;
     }
 }
 
