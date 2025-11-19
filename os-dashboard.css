@@ -269,14 +269,19 @@ table tbody tr:hover {
 }
 
 /* Status de Atendimento */
+.status-entrada_aparelho { background: #e3f2fd; color: #1565c0; }
 .status-pendente { background: #e7e7e7; color: #5a5a5a; }
+.status-atendimento_online { background: #e8f5e9; color: #2e7d32; }
 .status-aguardando_orcamento { background: #fff3cd; color: #856404; }
 .status-aguardando_pecas { background: #ffeaa7; color: #d63031; }
 .status-em_manutencao { background: #cce5ff; color: #004085; }
+.status-periodo_testes { background: #f3e5f5; color: #6a1b9a; }
 .status-aparelho_pronto { background: #d4edda; color: #155724; }
 .status-reprovado_esperando_devolucao { background: #f8d7da; color: #721c24; }
 .status-aguardando_visita_tecnica { background: #d1ecf1; color: #0c5460; }
 .status-aparelho_a_caminho { background: #e2d9f3; color: #5a3e8c; }
+.status-atendimento_finalizado { background: #c8e6c9; color: #1b5e20; }
+.status-recusado { background: #ffcdd2; color: #c62828; }
 .status-os_criada { background: #c3e6cb; color: #1e7e34; }
 
 /* Status de OS */
