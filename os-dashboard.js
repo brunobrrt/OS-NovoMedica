@@ -78,44 +78,52 @@ class OSDashboard {
     }
 
     initializeAuth() {
-        // Verificar autenticação usando authSystem
-        if (!authSystem.requireAuth()) {
-            return; // Redireciona automaticamente para login
+        // Sistema simplificado de autenticação - preparado para integração com Hostgator
+        // Por enquanto, permite acesso direto ao dashboard
+        
+        // Verificar se há usuário no localStorage (sessão existente)
+        let user = localStorage.getItem('currentUser');
+        
+        // Se não houver usuário, criar uma sessão temporária
+        if (!user) {
+            const tempUser = {
+                id: 'temp-user',
+                email: 'usuario@sistema.com',
+                name: 'Usuário do Sistema',
+                role: 'admin',
+                loginAt: new Date().toISOString()
+            };
+            localStorage.setItem('currentUser', JSON.stringify(tempUser));
+            user = JSON.stringify(tempUser);
         }
         
         // Atualizar informações do usuário na interface
-        const user = authSystem.getCurrentUser();
-        if (user) {
+        try {
+            const userData = JSON.parse(user);
             const userEmailElement = document.getElementById('userEmail');
             if (userEmailElement) {
-                userEmailElement.textContent = user.email;
+                userEmailElement.textContent = userData.email || 'Usuário';
             }
+        } catch (e) {
+            console.warn('Erro ao parsear dados do usuário:', e);
         }
         
-        // Verificar autenticação via token (compatibilidade)
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            // Em produção, redirecionar para login
-            console.warn('Token não encontrado. Usando modo mock.');
-            // Para desenvolvimento, usar token mock
-            const mockToken = 'mock-jwt-token';
-            localStorage.setItem('authToken', mockToken);
-            this.qrManager.setAuthToken(mockToken);
-            this.atendimentosAPI.setAuthToken(mockToken);
-            this.osAPI.setAuthToken(mockToken);
-            this.clientsAPI.setAuthToken(mockToken);
-        } else {
-            this.qrManager.setAuthToken(token);
-            this.atendimentosAPI.setAuthToken(token);
-            this.osAPI.setAuthToken(token);
-            this.clientsAPI.setAuthToken(token);
-        }
+        // Configurar token de autenticação
+        const token = localStorage.getItem('authToken') || 'mock-jwt-token';
+        localStorage.setItem('authToken', token);
+        
+        this.qrManager.setAuthToken(token);
+        this.atendimentosAPI.setAuthToken(token);
+        this.osAPI.setAuthToken(token);
+        this.clientsAPI.setAuthToken(token);
         
         // Configurar botão de logout
         const logoutButton = document.getElementById('logoutButton');
         if (logoutButton) {
             logoutButton.addEventListener('click', () => {
-                authSystem.logout();
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('authToken');
+                window.location.href = 'index.html';
             });
         }
     }
